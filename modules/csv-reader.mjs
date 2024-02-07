@@ -1,16 +1,19 @@
-const readFile = file => {
+const readFile = async(file) => {
     
-    const reader = new FileReader();
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+    
+      reader.onload = () => {
+        resolve(reader.result);
+      }
   
-    reader.addEventListener('load', () => {
-        const content = reader.result;
-        console.log(content);
-        document.querySelector('p').innerText = content;
-    }, false);
-  
-    if (file) {
+      reader.onerror = () => {
+        reject("FileReader is not supported on this browser");
+      }
+
       reader.readAsText(file);
-    }
+    });
+
 };
 
 export default readFile;
