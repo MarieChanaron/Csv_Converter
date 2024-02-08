@@ -89,8 +89,32 @@ const copyPasteValues = (inputHeader, outputHeader) => {
 }
 
 
+const formatJsonString = jsonString => {
+    jsonString = jsonString.substring(1, jsonString.length - 1);
+    return jsonString.replace(/""/g, '"');
+}
+
+
 const addManualTestSteps = () => {
-    // TODO: ajouter les lignes (Custom field (Manual Test Steps)) 
+    const headerInEntryFile = "Custom field (Manual Test Steps)";
+    const colIndex = getColumnIndex(headerInEntryFile);
+
+    // Voir si on peut rajouter une boucle à ce niveau
+
+    // Test avec une première issue
+    const testStepsValue = formatJsonString(twoDArray[25][colIndex]);
+    const testStepsJsonObject = JSON.parse(testStepsValue);
+    const nbOfLinesToAdd = testStepsJsonObject.length - 1;
+    
+    // Ajout des lignes
+    const arrayLength = convertedData.length;
+    for (let i = 0; i < nbOfLinesToAdd; i ++) {
+        convertedData[arrayLength + i] = new Array(convertedData[0].length);
+    }
+    console.log(convertedData);
+
+    // Décalage des lignes vers le bas
+
 }
 
 
