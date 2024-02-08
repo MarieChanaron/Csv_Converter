@@ -1,8 +1,41 @@
 const twoDArray = [];
 const convertedData = [];
+let columnsCount = 0;
+
+
+/*
+Correspondance between the input file and the output file.
+On the left: input file
+On the right: output file
+*/
+const headers = {
+    "Issue Key": "Issue key",
+    "Type": "Issue Type",
+    "Test Type": "Custom field (Test Type)",
+    "Status": "Status",
+    "TCID": undefined,
+    "Summary": "Summary",
+    "Description": "Description",
+    "Action": undefined,
+    "Data": undefined,
+    "Result": undefined,
+    "Priority": "Priority",
+    "Components": undefined,
+    "Test Repository Path": "Custom field (Test Repository Path)",
+    "Link \"Tests\"": "Outward issue link (Tests)",
+    "Link \"Defect\"": "Outward issue link (Defect)",
+    "Link \"Cloners\"": "Outward issue link (Cloners)",
+    "Reporter": "Reporter",
+    "Assignee": "Assignee",
+    "Label": "Labels",
+    "Custom field (Test Level)": "Custom field (Test Level)",
+    "Custom field (Steps Count)": "Custom field (Steps Count)",
+    "Environment": "Environment",
+    "Created": "Created"
+}
+
 
 const processData = content => {
-
     const rowsArray = content.split(/\r\n/);
     
     rowsArray.forEach(line => {
@@ -10,41 +43,62 @@ const processData = content => {
         twoDArray.push(columnsArray);
     });
 
-    console.log(rowsArray);
-    console.log(twoDArray);
-
-    return convertData();    
+    columnsCount = countHeaders();
+    return convertData();   
 }
 
-const convertData = () => {
 
+const countHeaders = () => {
+    let headersCount = twoDArray[0].reduce((accumulator, currentValue) => {
+        return accumulator[currentValue] ? ++accumulator[currentValue] :
+                                            accumulator[currentValue] = 1,
+                                            accumulator
+    }, {});
+    return headersCount;
+}
+
+
+const convertData = () => {
     for (let i = 0; i < twoDArray.length; i ++) {
         convertedData[i] = [];
     }
 
-    copyPasteValues('Issue key', 'Issue Key');
-    copyPasteValues('Issue Type', 'Type');
-    
-    console.log(convertedData);
+    for (const header in headers) {
+        copyPasteValues(headers[header], header);
+    }
 
+    addManualTestSteps();
     return convertedData;
 }
 
-const copyPasteValues = (inputHeader, outputHeader) => {
-    const indexCol = getColumnIndex(inputHeader);
-    const length = convertedData[0].length;
-    convertedData[0][length] = outputHeader;
 
-    for (let indexLine = 1; indexLine < twoDArray.length; indexLine ++) {
-        const value = twoDArray[indexLine][indexCol];
-        convertedData[indexLine][length] = value;
-    }
+const copyPasteValues = (inputHeader, outputHeader) => {
+    let indexCol = getColumnIndex(inputHeader);
+
+    for (let i = 0; i < columnsCount[inputHeader]; i ++) {
+        const length = convertedData[0].length; // To place the new column just after the previous one
+        convertedData[0][length] = outputHeader;
+        if (!outputHeader) return;
+
+        for (let indexLine = 1; indexLine < twoDArray.length; indexLine ++) {
+            const value = twoDArray[indexLine][indexCol];
+            convertedData[indexLine][length] = value;
+        }
+        indexCol ++;
+    }  
 }
+
+
+const addManualTestSteps = () => {
+    // TODO: ajouter les lignes (Custom field (Manual Test Steps)) 
+}
+
 
 const getColumnIndex = columnName => {
     const header = twoDArray[0];
     return header.indexOf(columnName);
 }
+
 
 const parseJson = jsonString => {
     const jsonObject = JSON.parse(jsonString);
@@ -54,5 +108,6 @@ const parseJson = jsonString => {
     const result = fields['Expected Result'];
     return [[action], [data], [result]];
 }
+
 
 export default processData;
