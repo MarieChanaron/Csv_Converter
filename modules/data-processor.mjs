@@ -1,4 +1,5 @@
 const twoDArray = [];
+const convertedData = [];
 
 const processData = content => {
 
@@ -17,27 +18,27 @@ const processData = content => {
 
 const convertData = () => {
 
-    // const convertedData = twoDArray;
-    const convertedData = []; 
-    // TODO: convertir/transformer les données
-
-    // Issue Key
-    // const columnName = "Status";
-    // const header = initialData[0];
-    // const index = header.indexOf(columnName);
-    // console.log("Index du status :" + index);
-    const index = getColumnIndex("Issue key");
-    console.log(`index: ${index}`);
-
-    // const colIndexInNewTable = 0;
     for (let i = 0; i < twoDArray.length; i ++) {
-        const value = twoDArray[i][index];
-        console.log(value);
-        
+        convertedData[i] = [];
     }
+
+    copyPasteValues('Issue key', 'Issue Key');
+    copyPasteValues('Issue Type', 'Type');
     
+    console.log(convertedData);
 
     return convertedData;
+}
+
+const copyPasteValues = (inputHeader, outputHeader) => {
+    const indexCol = getColumnIndex(inputHeader);
+    const length = convertedData[0].length;
+    convertedData[0][length] = outputHeader;
+
+    for (let indexLine = 1; indexLine < twoDArray.length; indexLine ++) {
+        const value = twoDArray[indexLine][indexCol];
+        convertedData[indexLine][length] = value;
+    }
 }
 
 const getColumnIndex = columnName => {
