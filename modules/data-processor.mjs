@@ -74,18 +74,18 @@ const convertData = () => {
 
 const copyPasteValues = (inputHeader, outputHeader) => {
     let indexCol = getColumnIndex(inputHeader);
-
-    for (let i = 0; i < columnsCount[inputHeader]; i ++) {
+    let count = columnsCount[inputHeader];
+    
+    for (let i = 0; (count && i < columnsCount[inputHeader]) || (!count && i < 1); i ++) {
         const length = convertedData[0].length; // To place the new column just after the previous one
         convertedData[0][length] = outputHeader;
-        if (!outputHeader) return;
 
-        for (let indexLine = 1; indexLine < twoDArray.length; indexLine ++) {
+        for (let indexLine = 1; inputHeader && indexLine < twoDArray.length; indexLine ++) {
             const value = twoDArray[indexLine][indexCol];
             convertedData[indexLine][length] = value;
         }
         indexCol ++;
-    }  
+    }
 }
 
 
@@ -102,36 +102,42 @@ const addManualTestSteps = () => {
     // Voir si on peut rajouter une boucle à ce niveau
 
     // Test avec une première issue
-    const testStepsValue = formatJsonString(twoDArray[25][colIndex]);
+    const issueIndex = 25;
+    const testStepsValue = formatJsonString(twoDArray[issueIndex][colIndex]);
     const testStepsJsonObject = JSON.parse(testStepsValue);
-    const nbOfLinesToAdd = testStepsJsonObject.length - 1;
+    console.log(testStepsJsonObject);
+    testStepsJsonObject.forEach(testStep => {
+        const fields = testStep.fields;
+        console.log(fields);
+        const dataIndex = getColumnIndex("");
+    });
+    // const nbOfLinesToAdd = testStepsJsonObject.length - 1;
     
     // Ajout des lignes
-    const arrayLength = convertedData.length;
-    for (let i = 0; i < nbOfLinesToAdd; i ++) {
-        convertedData[arrayLength + i] = new Array(convertedData[0].length);
-    }
-    console.log(convertedData);
+    // const arrayLength = convertedData.length;
+    // for (let i = 0; i < nbOfLinesToAdd; i ++) {
+    //     convertedData[arrayLength + i] = new Array(convertedData[0].length);
+    // }
+    // console.log(convertedData);
 
     // Décalage des lignes vers le bas
 
 }
 
 
-const getColumnIndex = columnName => {
+const getColumnIndex = (columnName, tableName = twoDArray) => {
     const header = twoDArray[0];
     return header.indexOf(columnName);
 }
 
 
-const parseJson = jsonString => {
-    const jsonObject = JSON.parse(jsonString);
-    const fields = jsonObject[0].fields;
-    const action = fields['Action'];
-    const data = fields['Data'];
-    const result = fields['Expected Result'];
-    return [[action], [data], [result]];
-}
+// const getTestSteps = jsonObject => {
+//     const fields = jsonObject.fields;
+//     const action = fields['Action'];
+//     const data = fields['Data'];
+//     const result = fields['Expected Result'];
+//     return [[action], [data], [result]];
+// }
 
 
 export default processData;
