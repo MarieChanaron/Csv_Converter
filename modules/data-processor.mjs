@@ -37,11 +37,41 @@ const headers = {
 }
 
 
+const parseRowIntoColumns = row => {
+    const columnsArray = [];
+    let withinQuotes = false;
+    let currentColumn = [];
+
+    for (let i = 0; i < row.length; i ++) {
+        const char = row[i];
+
+        switch (char) {
+            case '"':
+                withinQuotes = !withinQuotes;
+                break;
+            case ';':
+                if (!withinQuotes) {
+                    const col = currentColumn.join('');
+                    columnsArray.push(col);
+                    currentColumn = [];
+                } else {
+                    currentColumn.push(char);
+                }
+                break;
+            default:
+                currentColumn.push(char);
+        }
+    }
+    columnsArray.push(currentColumn); // Push the last column
+    return columnsArray;
+}
+
+
 const processData = content => {
     const rowsArray = content.split(/\r\n/);
     
-    rowsArray.forEach(line => {
-        const columnsArray = line.split(';');
+    rowsArray.forEach(row => {
+        const columnsArray = parseRowIntoColumns(row);
         twoDArray.push(columnsArray);
     });
 
@@ -83,7 +113,8 @@ const copyPasteValues = (inputHeader, outputHeader) => {
         convertedData[0][length] = outputHeader;
 
         for (let indexLine = 1; indexLine < twoDArray.length; indexLine ++) {
-            const value = twoDArray[indexLine][indexCol];
+            let value = twoDArray[indexLine][indexCol];
+            if (typeof value === 'string') value = doNotParse(value);
             convertedData[indexLine][length] = value ? value : ''; // Add an empty string if there is no value (to avoid bugs later on when adding test steps)
         }
         indexCol ++;
@@ -126,11 +157,18 @@ const insertNewLines = (linesArray, position) => {
 }
 
 
+function fixJsonString(jsonString) {
+    console.log(jsonString);
+    console.log(jsonString.split('{'));
+}
+
+
+
 const addManualTestSteps = () => {
     const headerInEntryFile = "Custom field (Manual Test Steps)";
     const colIndex = getColumnIndex(headerInEntryFile);
 
-    // Retrieval of the column positions of Action, Data and Result columns (in the new table)
+    // Retrieval of the column positions of Action, Data, Result and TCID columns (in the new table)
     const actionIndex = getColumnIndex("Action", convertedData);
     const dataIndex = getColumnIndex("Data", convertedData);
     const resultIndex = getColumnIndex("Result", convertedData);
@@ -148,36 +186,45 @@ const addManualTestSteps = () => {
         }
 
         // Add the test steps (Action, Data, Result)
-        const testStepsString = twoDArray[i][colIndex];
-        let testStepsValue = '';
-        if (testStepsString) testStepsValue = formatJsonString(twoDArray[i][colIndex]);
-        let testStepsJsonObject;
-        
-        try {
-            testStepsJsonObject = JSON.parse(testStepsValue);
-        } catch (error) {
-            testStepsJsonObject = [];
-        }
+        // const testStepsString = twoDArray[i][colIndex];
+        // console.log(testStepsString.split('~'));
+        // const example = '[{id:170903,index:1,fields:{Action:Check the correct behavior of RSM linked to the Rule 29 with a function call of 10 parameters,Data:,Expected Result:},attachments:[],testVersionId:18752},{id:170904,index:2,fields:{Action:Check the correct behavior of RSM linked to the Rule 29 with a function call of more than 10 parameters,Data:,Expected Result:},attachments:[],testVersionId:18752}]';
+        // fixJsonString(example);
 
-        testStepsJsonObject.forEach((testStep, pos) => {
-            const fields = testStep.fields;
-            const action = doNotParse(fields['Action']);
-            const data = doNotParse(fields['Data']);
-            const result = doNotParse(fields['Expected Result']);
-            if (pos === 0) { // Add the first test step directly in the issue line
-                convertedData[issueIndex][actionIndex] = action;
-                convertedData[issueIndex][dataIndex] = data;
-                convertedData[issueIndex][resultIndex] = result;
-            } else { // For the additional test steps: make new lines
-                const newLine = new Array(convertedData[0].length);
-                newLine.fill('');
-                newLine[actionIndex] = action;
-                newLine[dataIndex] = data;
-                newLine[resultIndex] = result;
-                newLine[tcidIndex] = i.toString(); // Add the TCID in the new line
-                newLines.push(newLine);
-            }
-        });
+
+        // console.log(testStepsJsonObject);
+        // console.log(testStepsJsonObject[0]['fields']);
+        // let testStepsValue = '';
+        // if (testStepsString) testStepsValue = formatJsonString(testStepsString);
+        // let testStepsJsonObject;
+        
+        // try {
+        //     testStepsJsonObject = JSON.parse(testStepsString);
+        //     console.log(testStepsJsonObject);
+        // } catch (error) {
+        //     testStepsJsonObject = [];
+        // }
+
+        // testStepsJsonObject.forEach((testStep, pos) => {
+        //     const fields = testStep.fields;
+        //     console.log(fields);
+        //     const action = doNotParse(fields['Action']);
+        //     const data = doNotParse(fields['Data']);
+        //     const result = doNotParse(fields['Expected Result']);
+        //     if (pos === 0) { // Add the first test step directly in the issue line
+        //         convertedData[issueIndex][actionIndex] = action;
+        //         convertedData[issueIndex][dataIndex] = data;
+        //         convertedData[issueIndex][resultIndex] = result;
+        //     } else { // For the additional test steps: make new lines
+        //         const newLine = new Array(convertedData[0].length);
+        //         newLine.fill('');
+        //         newLine[actionIndex] = action;
+        //         newLine[dataIndex] = data;
+        //         newLine[resultIndex] = result;
+        //         newLine[tcidIndex] = i.toString(); // Add the TCID in the new line
+        //         newLines.push(newLine);
+        //     }
+        // });
 
         // Add the new lines to the convertedData array
         insertNewLines(newLines, issueIndex + 1);
