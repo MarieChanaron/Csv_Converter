@@ -1,10 +1,11 @@
+let rowsArray = [];
 const twoDArray = [];
 let convertedData = [];
 let columnsCount = 0;
 
 
 /*
-Correspondance between the input file and the output file.
+Matching between the input file and the output file.
 On the left (key): input file
 On the right (value): output file
 */
@@ -68,7 +69,7 @@ const parseRowIntoColumns = row => {
 
 
 const processData = content => {
-    const rowsArray = content.split(/\r\n/);
+    rowsArray = content.split(/\r\n/);
     
     rowsArray.forEach(row => {
         const columnsArray = parseRowIntoColumns(row);
@@ -123,11 +124,8 @@ const copyPasteValues = (inputHeader, outputHeader) => {
 
 
 const formatJsonString = jsonString => {
-    if (jsonString[0] === '"') {
-        jsonString = jsonString.substring(1, jsonString.length - 1);
-    }
-    const newString = jsonString.replace(/""/g, '"');
-    return newString;
+    const newJsonString = jsonString.replace(/""/g, '"');
+    return newJsonString;
 }
 
 
@@ -139,11 +137,12 @@ const doNotParse = string => {
 
 
 const getIssueLineInNewTable = issueKey => {
-    for (let i = 0; i < convertedData.length; i ++) {
-        if (convertedData[i][0] === issueKey) {
+    for (let i = 0; i < convertedData.length; i++) {
+        if (convertedData[i][0] === `"${issueKey}"`) {
             return i;
         }
     }
+    return -1;
 }
 
 
@@ -155,13 +154,6 @@ const insertNewLines = (linesArray, position) => {
     const secondPart = convertedData.slice(position);
     convertedData = firstPart.concat(linesArray).concat(secondPart);
 }
-
-
-function fixJsonString(jsonString) {
-    console.log(jsonString);
-    console.log(jsonString.split('{'));
-}
-
 
 
 const addManualTestSteps = () => {
@@ -186,45 +178,46 @@ const addManualTestSteps = () => {
         }
 
         // Add the test steps (Action, Data, Result)
-        // const testStepsString = twoDArray[i][colIndex];
-        // console.log(testStepsString.split('~'));
-        // const example = '[{id:170903,index:1,fields:{Action:Check the correct behavior of RSM linked to the Rule 29 with a function call of 10 parameters,Data:,Expected Result:},attachments:[],testVersionId:18752},{id:170904,index:2,fields:{Action:Check the correct behavior of RSM linked to the Rule 29 with a function call of more than 10 parameters,Data:,Expected Result:},attachments:[],testVersionId:18752}]';
-        // fixJsonString(example);
-
-
-        // console.log(testStepsJsonObject);
-        // console.log(testStepsJsonObject[0]['fields']);
-        // let testStepsValue = '';
-        // if (testStepsString) testStepsValue = formatJsonString(testStepsString);
-        // let testStepsJsonObject;
+        const firstSection = rowsArray[i].split('[{')[1];
+        let secondSection;
+        if (firstSection) {
+            secondSection = firstSection.split('}]')[0];
+            if (secondSection[secondSection.length - 1] === ':') secondSection += '""""';
+        }
+        let jsonString = secondSection ? `[{${formatJsonString(secondSection)}}]` : '[]';
         
-        // try {
-        //     testStepsJsonObject = JSON.parse(testStepsString);
-        //     console.log(testStepsJsonObject);
-        // } catch (error) {
-        //     testStepsJsonObject = [];
-        // }
+        // Parse the JSON string
+        let jsonObject;
 
-        // testStepsJsonObject.forEach((testStep, pos) => {
-        //     const fields = testStep.fields;
-        //     console.log(fields);
-        //     const action = doNotParse(fields['Action']);
-        //     const data = doNotParse(fields['Data']);
-        //     const result = doNotParse(fields['Expected Result']);
-        //     if (pos === 0) { // Add the first test step directly in the issue line
-        //         convertedData[issueIndex][actionIndex] = action;
-        //         convertedData[issueIndex][dataIndex] = data;
-        //         convertedData[issueIndex][resultIndex] = result;
-        //     } else { // For the additional test steps: make new lines
-        //         const newLine = new Array(convertedData[0].length);
-        //         newLine.fill('');
-        //         newLine[actionIndex] = action;
-        //         newLine[dataIndex] = data;
-        //         newLine[resultIndex] = result;
-        //         newLine[tcidIndex] = i.toString(); // Add the TCID in the new line
-        //         newLines.push(newLine);
-        //     }
-        // });
+        try {
+            jsonObject = JSON.parse(jsonString);
+        } catch (error) {
+            console.log(error);
+            console.log(`Cannot parse JSON data for issue ${issueKey}`);
+            console.log(`Cannot read the test steps (action/data/result columns) for the issue ${issueKey}`);
+            console.log(jsonString);
+            jsonObject = [];
+        }
+
+        jsonObject.forEach((testStep, pos) => {
+            const fields = testStep.fields;
+            const action = doNotParse(fields['Action']);
+            const data = doNotParse(fields['Data']);
+            const result = doNotParse(fields['Expected Result']);
+            if (pos === 0) { // Add the first test step directly in the issue line
+                convertedData[issueIndex][actionIndex] = action;
+                convertedData[issueIndex][dataIndex] = data;
+                convertedData[issueIndex][resultIndex] = result;
+            } else { // For the additional test steps: make new lines
+                const newLine = new Array(convertedData[0].length);
+                newLine.fill('');
+                newLine[actionIndex] = action;
+                newLine[dataIndex] = data;
+                newLine[resultIndex] = result;
+                newLine[tcidIndex] = i.toString(); // Add the TCID in the new line
+                newLines.push(newLine);
+            }
+        });
 
         // Add the new lines to the convertedData array
         insertNewLines(newLines, issueIndex + 1);
