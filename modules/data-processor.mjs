@@ -90,8 +90,16 @@ const copyPasteValues = (inputHeader, outputHeader) => {
 
 
 const formatJsonString = jsonString => {
-    jsonString = jsonString.substring(1, jsonString.length - 1);
-    return jsonString.replace(/""/g, '"');
+    if (jsonString[0] === '"') {
+        jsonString = jsonString.substring(1, jsonString.length - 1);
+    }
+    const newString = jsonString.replace(/""/g, '"');
+    return newString;
+}
+
+
+const handleLineBreaks = string => {
+    return string.replace(/[\r\n]/g, '');
 }
 
 
@@ -113,44 +121,48 @@ const addManualTestSteps = () => {
     const dataIndex = getColumnIndex("Data", convertedData);
     const resultIndex = getColumnIndex("Result", convertedData);
     
-    let issueIndex = -1;
-    const issueKey = 'RIMSCG2-991';
-
-    // Voir si on peut rajouter une boucle à ce niveau
-
-    issueIndex = getIssueLineInNewTable(issueKey);
-
-    // Test avec une première issue
-    const testStepsValue = formatJsonString(twoDArray[issueIndex][colIndex]);
-    const testStepsJsonObject = JSON.parse(testStepsValue);
-    const newLines = [];
-
-    testStepsJsonObject.forEach((testStep, pos) => {
-        const fields = testStep.fields;
-        if (pos === 0) { // First test step: add it directly in the issue line
-            convertedData[issueIndex][actionIndex] = fields['Action'];
-            convertedData[issueIndex][dataIndex] = fields['Data'];
-            convertedData[issueIndex][resultIndex] = fields['Expected Result'];
-            console.log(convertedData);
-        } else { // For the additional test steps: make new lines
-            const newLine = new Array(convertedData[0].length);
-            newLine.fill('');
-            newLine[actionIndex] = fields['Action'];
-            newLine[dataIndex] = fields['Data'];
-            newLine[resultIndex] = fields['Expected Result'];
-            newLines.push(newLine);
+    for (let i = 1; i < twoDArray.length; i ++) {
+        
+        const testStepsString = twoDArray[i][colIndex];
+        let testStepsValue = '';
+        if (testStepsString) testStepsValue = formatJsonString(twoDArray[i][colIndex]);
+        let testStepsJsonObject;
+        
+        try {
+            testStepsJsonObject = JSON.parse(testStepsValue);
+        } catch (error) {
+            testStepsJsonObject = [];
         }
-    });
 
-    console.log(newLines);
+        const newLines = [];
+        let issueKey = twoDArray[i][0];
+        let issueIndex = getIssueLineInNewTable(issueKey);
 
-    // Add the lines to the convertedData array
-    // Separate the convertedData array into two parts
-    console.log(`Issue index: ${issueIndex}`);
-    const firstPart = convertedData.slice(0, issueIndex + 1);
-    const secondPart = convertedData.slice(issueIndex + 1);
-    convertedData = firstPart.concat(newLines).concat(secondPart);
-    console.log(convertedData);
+        testStepsJsonObject.forEach((testStep, pos) => {
+            const fields = testStep.fields;
+            const action = handleLineBreaks(fields['Action']);
+            const data = handleLineBreaks(fields['Data']);
+            const result = handleLineBreaks(fields['Expected Result']);
+            if (pos === 0) { // First test step: add it directly in the issue line
+                convertedData[issueIndex][actionIndex] = action;
+                convertedData[issueIndex][dataIndex] = data;
+                convertedData[issueIndex][resultIndex] = result;
+            } 
+            else { // For the additional test steps: make new lines
+                const newLine = new Array(convertedData[0].length);
+                newLine.fill('');
+                newLine[actionIndex] = action;
+                newLine[dataIndex] = data;
+                newLine[resultIndex] = result;
+                newLines.push(newLine);
+            }
+        });
+
+        // Add the new lines to the convertedData array
+        const firstPart = convertedData.slice(0, issueIndex + 1);
+        const secondPart = convertedData.slice(issueIndex + 1);
+        convertedData = firstPart.concat(newLines).concat(secondPart);
+    }
 }
 
 
