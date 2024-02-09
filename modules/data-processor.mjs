@@ -112,11 +112,6 @@ const getIssueLineInNewTable = issueKey => {
 }
 
 
-const getTcid = issueKey => {
-
-}
-
-
 const addManualTestSteps = () => {
     const headerInEntryFile = "Custom field (Manual Test Steps)";
     const colIndex = getColumnIndex(headerInEntryFile);
