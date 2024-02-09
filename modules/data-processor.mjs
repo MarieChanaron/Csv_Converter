@@ -112,6 +112,11 @@ const getIssueLineInNewTable = issueKey => {
 }
 
 
+const getTcid = issueKey => {
+
+}
+
+
 const addManualTestSteps = () => {
     const headerInEntryFile = "Custom field (Manual Test Steps)";
     const colIndex = getColumnIndex(headerInEntryFile);
@@ -120,9 +125,20 @@ const addManualTestSteps = () => {
     const actionIndex = getColumnIndex("Action", convertedData);
     const dataIndex = getColumnIndex("Data", convertedData);
     const resultIndex = getColumnIndex("Result", convertedData);
+    const tcidIndex = getColumnIndex("TCID", convertedData);
     
     for (let i = 1; i < twoDArray.length; i ++) {
-        
+
+        const newLines = [];
+        let issueKey = twoDArray[i][0];
+        let issueIndex = getIssueLineInNewTable(issueKey);
+
+        // Add the TCID
+        if (issueKey) {
+            convertedData[issueIndex][tcidIndex] = i.toString();
+        }
+
+        // Add the test steps (Action, Data, Result)
         const testStepsString = twoDArray[i][colIndex];
         let testStepsValue = '';
         if (testStepsString) testStepsValue = formatJsonString(twoDArray[i][colIndex]);
@@ -134,16 +150,12 @@ const addManualTestSteps = () => {
             testStepsJsonObject = [];
         }
 
-        const newLines = [];
-        let issueKey = twoDArray[i][0];
-        let issueIndex = getIssueLineInNewTable(issueKey);
-
         testStepsJsonObject.forEach((testStep, pos) => {
             const fields = testStep.fields;
             const action = handleLineBreaks(fields['Action']);
             const data = handleLineBreaks(fields['Data']);
             const result = handleLineBreaks(fields['Expected Result']);
-            if (pos === 0) { // First test step: add it directly in the issue line
+            if (pos === 0) { // Add the first test step directly in the issue line
                 convertedData[issueIndex][actionIndex] = action;
                 convertedData[issueIndex][dataIndex] = data;
                 convertedData[issueIndex][resultIndex] = result;
@@ -154,6 +166,8 @@ const addManualTestSteps = () => {
                 newLine[actionIndex] = action;
                 newLine[dataIndex] = data;
                 newLine[resultIndex] = result;
+                // Add the TCID in the new line
+                newLine[tcidIndex] = i.toString();
                 newLines.push(newLine);
             }
         });
