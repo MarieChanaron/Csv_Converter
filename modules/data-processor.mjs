@@ -84,6 +84,8 @@ const copyPasteValues = (inputHeader, outputHeader) => {
 
         for (let indexLine = 1; indexLine < twoDArray.length; indexLine ++) {
             const value = twoDArray[indexLine][indexCol];
+            if(isDateTimeString(value))
+                {formatDate(value);}
             convertedData[indexLine][length] = value ? value : ''; // Add an empty string if there is no value (to avoid bugs later on when adding test steps)
         }
         indexCol ++;
@@ -190,5 +192,36 @@ const getColumnIndex = (columnName, tableName = twoDArray) => {
     return header.indexOf(columnName);
 }
 
+// pour vérifier si une valeur correspond au format dd/mm/yyyy hh:mm:ss
+
+const isDateTimeString = value => {
+    const regex = /^\d{2}\/\d{2}\/\d{4}\s+\d{2}:\d{2}:\d{2}$/;
+    return regex.test(value);
+}
+
+//  pour formater les dates du format dd/mm/yyyy hh:mm:ss
+const formatDate = mydate  =>  {
+    // Récupérer les composants de la date du format "27/10/2020 16:55:00"
+    const day = mydate.substring(0,2);
+    let month = mydate.substring(3,5) ;
+    const year = mydate.substring(8,10); 
+    let hours = mydate.substring(12,14);
+    const minutes = mydate.substring(15,17);
+
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    // Gestion des heures à 0h
+    hours = hours % 12;
+    hours = hours ? hours : 12; 
+    // Gestion des mois si on a 09 -> 9
+    month = month % 12;
+    month = month ? month : 12;
+    // Tableau des noms de mois abrégés
+    const monthNames = ['','Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const monthName = monthNames[month];
+
+    // Concaténer et retourner la date formatée
+    const formattedDate = `${day}/${monthName}/${year} ${hours}:${minutes} ${ampm}`;
+    return formattedDate;
+}
 
 export default processData;
