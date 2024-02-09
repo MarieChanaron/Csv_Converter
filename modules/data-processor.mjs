@@ -1,5 +1,5 @@
 const twoDArray = [];
-const convertedData = [];
+let convertedData = [];
 let columnsCount = 0;
 
 
@@ -80,9 +80,9 @@ const copyPasteValues = (inputHeader, outputHeader) => {
         const length = convertedData[0].length; // To place the new column just after the previous one
         convertedData[0][length] = outputHeader;
 
-        for (let indexLine = 1; inputHeader && indexLine < twoDArray.length; indexLine ++) {
+        for (let indexLine = 1; indexLine < twoDArray.length; indexLine ++) {
             const value = twoDArray[indexLine][indexCol];
-            convertedData[indexLine][length] = value;
+            convertedData[indexLine][length] = value ? value : ''; // Add an empty string if there is no value (to avoid bugs later on when adding test steps)
         }
         indexCol ++;
     }
@@ -95,49 +95,69 @@ const formatJsonString = jsonString => {
 }
 
 
+const getIssueLineInNewTable = issueKey => {
+    for (let i = 0; i < convertedData.length; i ++) {
+        if (convertedData[i][0] === issueKey) {
+            return i;
+        }
+    }
+}
+
+
 const addManualTestSteps = () => {
     const headerInEntryFile = "Custom field (Manual Test Steps)";
     const colIndex = getColumnIndex(headerInEntryFile);
 
+    // Récupération de la position des colonnes Action, Data et Result dans le nouveau tableau
+    const actionIndex = getColumnIndex("Action", convertedData);
+    const dataIndex = getColumnIndex("Data", convertedData);
+    const resultIndex = getColumnIndex("Result", convertedData);
+    
+    let issueIndex = -1;
+    const issueKey = 'RIMSCG2-991';
+
     // Voir si on peut rajouter une boucle à ce niveau
 
+    issueIndex = getIssueLineInNewTable(issueKey);
+
     // Test avec une première issue
-    const issueIndex = 25;
     const testStepsValue = formatJsonString(twoDArray[issueIndex][colIndex]);
     const testStepsJsonObject = JSON.parse(testStepsValue);
-    console.log(testStepsJsonObject);
-    testStepsJsonObject.forEach(testStep => {
+    const newLines = [];
+
+    testStepsJsonObject.forEach((testStep, pos) => {
         const fields = testStep.fields;
-        console.log(fields);
-        const dataIndex = getColumnIndex("");
+        if (pos === 0) { // First test step: add it directly in the issue line
+            convertedData[issueIndex][actionIndex] = fields['Action'];
+            convertedData[issueIndex][dataIndex] = fields['Data'];
+            convertedData[issueIndex][resultIndex] = fields['Expected Result'];
+            console.log(convertedData);
+        } else { // For the additional test steps: make new lines
+            const newLine = new Array(convertedData[0].length);
+            newLine.fill('');
+            newLine[actionIndex] = fields['Action'];
+            newLine[dataIndex] = fields['Data'];
+            newLine[resultIndex] = fields['Expected Result'];
+            newLines.push(newLine);
+        }
     });
-    // const nbOfLinesToAdd = testStepsJsonObject.length - 1;
-    
-    // Ajout des lignes
-    // const arrayLength = convertedData.length;
-    // for (let i = 0; i < nbOfLinesToAdd; i ++) {
-    //     convertedData[arrayLength + i] = new Array(convertedData[0].length);
-    // }
-    // console.log(convertedData);
 
-    // Décalage des lignes vers le bas
+    console.log(newLines);
 
+    // Add the lines to the convertedData array
+    // Separate the convertedData array into two parts
+    console.log(`Issue index: ${issueIndex}`);
+    const firstPart = convertedData.slice(0, issueIndex + 1);
+    const secondPart = convertedData.slice(issueIndex + 1);
+    convertedData = firstPart.concat(newLines).concat(secondPart);
+    console.log(convertedData);
 }
 
 
 const getColumnIndex = (columnName, tableName = twoDArray) => {
-    const header = twoDArray[0];
+    const header = tableName[0];
     return header.indexOf(columnName);
 }
-
-
-// const getTestSteps = jsonObject => {
-//     const fields = jsonObject.fields;
-//     const action = fields['Action'];
-//     const data = fields['Data'];
-//     const result = fields['Expected Result'];
-//     return [[action], [data], [result]];
-// }
 
 
 export default processData;
