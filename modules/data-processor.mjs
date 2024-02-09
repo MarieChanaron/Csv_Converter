@@ -82,6 +82,10 @@ const copyPasteValues = (inputHeader, outputHeader) => {
 
         for (let indexLine = 1; indexLine < twoDArray.length; indexLine ++) {
             const value = twoDArray[indexLine][indexCol];
+            // if (outputHeader === 'Description' && value) {
+            //     console.log(indexLine);
+            //     console.log(value.split('€'));
+            // }
             convertedData[indexLine][length] = value ? value : ''; // Add an empty string if there is no value (to avoid bugs later on when adding test steps)
         }
         indexCol ++;
@@ -99,7 +103,8 @@ const formatJsonString = jsonString => {
 
 
 const handleLineBreaks = string => {
-    return string.replace(/[\r\n]/g, '');
+    string = string.replace(/"/g, '""');
+    return `"${string}"`;
 }
 
 
@@ -148,6 +153,7 @@ const addManualTestSteps = () => {
         testStepsJsonObject.forEach((testStep, pos) => {
             const fields = testStep.fields;
             const action = handleLineBreaks(fields['Action']);
+            console.log(action);
             const data = handleLineBreaks(fields['Data']);
             const result = handleLineBreaks(fields['Expected Result']);
             if (pos === 0) { // Add the first test step directly in the issue line
