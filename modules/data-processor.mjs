@@ -173,8 +173,8 @@ const addManualTestSteps = () => {
         let issueIndex = getIssueLineInNewTable(issueKey);
 
         // Add the TCID
-        if (issueKey && convertedData[issueIndex]) {
-            convertedData[issueIndex][tcidIndex] = i.toString();
+        if (issueKey.length > 0 && convertedData[issueIndex]) {
+            convertedData[issueIndex][tcidIndex] = `"${i.toString()}"`;
         }
 
         // Add the test steps (Action, Data, Result)
@@ -214,7 +214,7 @@ const addManualTestSteps = () => {
                 newLine[actionIndex] = action;
                 newLine[dataIndex] = data;
                 newLine[resultIndex] = result;
-                newLine[tcidIndex] = i.toString(); // Add the TCID in the new line
+                newLine[tcidIndex] = `"${i.toString()}"`; // Add the TCID in the new line
                 newLines.push(newLine);
             }
         });
