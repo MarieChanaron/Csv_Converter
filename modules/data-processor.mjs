@@ -156,7 +156,19 @@ const addManualTestSteps = () => {
         try {
             testStepsJsonObject = JSON.parse(testStepsValue);
         } catch (error) {
-            testStepsJsonObject = [];
+            function logOnPage(messageLog) {
+                const consoleMessage = document.getElementById("consoleLog");
+                consoleMessage.innerHTML += messageLog + "<br>";
+            }
+            // Remplace la méthode console.log par notre fonction logOnPage
+        console.log = logOnPage;
+
+        console.log(error);
+        console.log(`Cannot parse JSON data for issue ${issueKey}`);
+        console.log(`Cannot read the test steps (action/date/result colunms)`);
+        console.log(jsonString);
+
+        testStepsJsonObject = [];
         }
 
         testStepsJsonObject.forEach((testStep, pos) => {
