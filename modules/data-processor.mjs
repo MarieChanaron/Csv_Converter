@@ -21,7 +21,7 @@ const headers = {
     "Data": undefined,
     "Result": undefined,
     "Priority": "Priority",
-    "Components": undefined,
+    "Components": "Component/s",
     "Test Repository Path": "Custom field (Test Repository Path)",
     "Link \"Tests\"": "Outward issue link (Tests)",
     "Link \"Defect\"": "Outward issue link (Defect)",
