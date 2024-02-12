@@ -76,8 +76,6 @@ const processData = content => {
         twoDArray.push(columnsArray);
     });
 
-    console.log(twoDArray);
-
     columnsCount = countHeaders();
     return convertData();   
 }
