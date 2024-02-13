@@ -1,6 +1,7 @@
 import readFile from "./modules/csv-reader.mjs";
-import processData from "./modules/data-processor.mjs";
 import writeCsv from "./modules/csv-maker.mjs";
+import parseData from "./modules/csv-parser.mjs";
+import convertData from "./modules/data-processor.mjs";
 
 
 const showSpinner= () => {
@@ -54,10 +55,11 @@ const handleSubmit = async(event) => {
         hideLogs();
 
         const fileContent = await readFile(file);
-        const twoDArray = processData(fileContent);
-        writeCsv(twoDArray);
+        const {rows, columns} = parseData(fileContent);
+        const convertedData = convertData({rows, columns});
+        writeCsv(convertedData);
 
         hideSpinner();
-        showLogs(twoDArray);
+        showLogs(convertedData);
     }
 }
