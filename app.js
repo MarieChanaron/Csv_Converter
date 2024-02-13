@@ -4,6 +4,7 @@ import writeCsv from "./modules/csv-maker.mjs";
 
 window.onload = () => {
     document.querySelector('form').onsubmit = handleSubmit;
+    document.querySelector('input[type="submit"]').onclick = handleClick;
 }
 
 const handleSubmit = async(event) => {
@@ -12,4 +13,12 @@ const handleSubmit = async(event) => {
     const fileContent = await readFile(file);
     const twoDArray = processData(fileContent);
     writeCsv(twoDArray);
+}
+
+const handleClick = () => {
+    console.clear();
+    const errorsDiv = document.getElementById('errors');
+    while (errorsDiv.firstChild) {
+        errorsDiv.removeChild(errorsDiv.firstChild);
+    }
 }

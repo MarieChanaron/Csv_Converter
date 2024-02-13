@@ -193,7 +193,7 @@ const addManualTestSteps = () => {
             jsonObject = JSON.parse(jsonString);
         } catch (error) {
 
-            const logsDivElement = document.getElementById('logs');
+            const errorsDivElement = document.getElementById('errors');
             const errorDiv = document.createElement('div');
             errorDiv.className = 'error';
 
@@ -213,7 +213,7 @@ const addManualTestSteps = () => {
             errorDiv.appendChild(secondParagraph);
             errorDiv.appendChild(textarea);
 
-            logsDivElement.appendChild(errorDiv);
+            errorsDivElement.appendChild(errorDiv);
 
             // Show the same errors in the console
             console.log(error);
