@@ -37,15 +37,11 @@ p span {
     font-style: italic;
 }
 
-p#first-step {
-    margin-left: 15px;
-}
-
 form {
     border: 1px solid lightgrey;
     border-radius: 4px;
     padding: 10px 20px;
-    margin: 30px 15px;
+    margin: 30px 0;
     width: 700px;
     background-color: #27b44e;
     color: white;
@@ -78,6 +74,10 @@ textarea {
     padding: 5px;
     margin-top: 10px;
     margin-bottom: 10px;
+}
+
+div#logs {
+    margin-left: 10px;
 }
 
 div.error {
