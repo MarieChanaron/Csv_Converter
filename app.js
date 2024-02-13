@@ -14,7 +14,7 @@ const handleSubmit = async(event) => {
     const twoDArray = processData(fileContent);
     writeCsv(twoDArray);
     const confirmationDiv = document.getElementById('confirmation');
-    if (twoDArray.length > 0) confirmationDiv.removeAttribute('hidden');
+    if (twoDArray.length > 1) confirmationDiv.removeAttribute('hidden');
     const logsDiv = document.getElementById('logs');
     logsDiv.removeAttribute('hidden');
 }

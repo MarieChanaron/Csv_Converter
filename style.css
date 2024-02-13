@@ -29,12 +29,23 @@ h3 {
 }
 
 h3 span {
-    color: #1a7835;
+    color: #229743;
     font-size: 13px;
 }
 
 p span {
     font-style: italic;
+}
+
+#confirmation {
+    display: flex;
+    align-items: center;
+}
+
+.icon {
+    width: 24px;
+    height: 24px;
+    margin-left: 5px;
 }
 
 form {
