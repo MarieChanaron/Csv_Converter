@@ -68,6 +68,9 @@ const convertData = ({rows, columns}) => {
 
 const copyPasteValues = (inputHeader, outputHeader) => {
     let indexCol = getColumnIndex(inputHeader);
+    if (inputHeader && indexCol === -1) {
+        console.log(`La colonne ${inputHeader} n'existe pas dans le fichier d'origine.`);
+    }
     let count = columnsCount[inputHeader];
     
     for (let i = 0; (count && i < columnsCount[inputHeader]) || (!count && i < 1); i ++) {
@@ -157,7 +160,6 @@ const addParsingErrorToHtml = (issueKey, error, jsonString) => {
 
 // Convert a json string into a json object
 const parseJsonString = jsonString => {
-    // Parse the JSON string
     let jsonObject;
     let error = false;
     let message = '';
@@ -197,7 +199,7 @@ const addManualTestSteps = () => {
 
         // Parse the rows array to extract the json string containing the test steps
         // Note: Because the 2 dimensions array contains the json string WITHOUT quotes, it's not possible to read the json string.
-        // It was complicated to add quotes manually in this jsos string so the solution was to use the function split() that automatically adds quotes.
+        // It was complicated to add quotes manually in this json string so the solution was to use the function split() that automatically adds quotes.
         // So we get the json string from the rowsArray and not from the twoDArray
         const firstSection = rowsArray[i] && rowsArray[i].split('[{')[1];
         let secondSection;
