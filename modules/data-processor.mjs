@@ -214,6 +214,9 @@ const addManualTestSteps = () => {
             errorDiv.appendChild(textarea);
 
             errorsDivElement.appendChild(errorDiv);
+            
+            const logsDiv = document.getElementById('logs');
+            logsDiv.removeAttribute('hidden');
 
             // Show the same errors in the console
             console.log(error);

@@ -13,6 +13,10 @@ const handleSubmit = async(event) => {
     const fileContent = await readFile(file);
     const twoDArray = processData(fileContent);
     writeCsv(twoDArray);
+    const confirmationDiv = document.getElementById('confirmation');
+    if (twoDArray.length > 0) confirmationDiv.removeAttribute('hidden');
+    const logsDiv = document.getElementById('logs');
+    logsDiv.removeAttribute('hidden');
 }
 
 const handleClick = () => {
@@ -21,4 +25,6 @@ const handleClick = () => {
     while (errorsDiv.firstChild) {
         errorsDiv.removeChild(errorsDiv.firstChild);
     }
+    const confirmationDiv = document.getElementById('confirmation');
+    confirmationDiv.setAttribute('hidden');
 }
