@@ -84,8 +84,9 @@ const copyPasteValues = (inputHeader, outputHeader) => {
 }
 
 
+// Make the json string compatible with the json format to be able to read it as an object
 const formatJsonString = jsonString => {
-    const newJsonString = jsonString.replace(/""/g, '"');
+    const newJsonString = jsonString.replace(/""/g, '"'); // Replace "" by "
     return newJsonString;
 }
 
@@ -97,6 +98,7 @@ const doNotParse = string => {
 }
 
 
+// Find the position of the issue (the number of the line) in the new table
 const getIssueLineInNewTable = issueKey => {
     for (let i = 0; i < convertedData.length; i++) {
         if (convertedData[i][0] === `"${issueKey}"`) {
@@ -117,38 +119,65 @@ const insertNewLines = (linesArray, position) => {
 }
 
 
-const addErrorToHtml = (issueKey, error, jsonString) => {
+// Show the logs of the json parsing errors to the interface
+const addParsingErrorToHtml = (issueKey, error, jsonString) => {
     const errorsDivElement = document.getElementById('errors');
+    
+    // Create a div to contain the parsing error for a particular issue
     const errorDiv = document.createElement('div');
     errorDiv.className = 'error';
 
+    // Add a small title to indicate which issue key is concerned
     const errorTitle = document.createElement('h3');
     errorTitle.innerHTML = `Erreur pour <span>${issueKey}</span> : `;
 
+    // Add a small paragraph to inform that the json object cannot be parsed
     const firstParagraph = document.createElement('p');
     firstParagraph.innerText = 'Impossible de parser les données JSON de la colonne "Custom field (Manual Test Steps)"';
+    // Add a small paragraph to log the exact error message returned by the browser
     const secondParagraph = document.createElement('p');
     secondParagraph.innerHTML = `Message : <span>${error}</span>`;
 
+    // Add a textarea (with an inner scroll) to display the content of the json object that cannot be parsed
     const textarea = document.createElement('textarea');
     textarea.innerText = jsonString;
 
+    // Add the error to the DOM
     errorDiv.appendChild(errorTitle);
     errorDiv.appendChild(firstParagraph);
     errorDiv.appendChild(secondParagraph);
     errorDiv.appendChild(textarea);
-
     errorsDivElement.appendChild(errorDiv);
     
+    // Show the logs
     const logsDiv = document.getElementById('logs');
     logsDiv.removeAttribute('hidden');
 }
 
 
-const addManualTestSteps = () => {
-    const headerInEntryFile = "Custom field (Manual Test Steps)";
-    const colIndex = getColumnIndex(headerInEntryFile);
+// Convert a json string into a json object
+const parseJsonString = jsonString => {
+    // Parse the JSON string
+    let jsonObject;
+    let error = false;
+    let message = '';
 
+    try {
+        jsonObject = JSON.parse(jsonString);
+    } catch (errorMessage) {
+        error = true;
+        message = errorMessage;
+        jsonObject = [];
+    }
+
+    return {
+        jsonObject, 
+        error: [error, message]
+    };
+}
+
+
+const addManualTestSteps = () => {
     // Retrieval of the column positions of Action, Data, Result and TCID columns (in the new table)
     const actionIndex = getColumnIndex("Action", convertedData);
     const dataIndex = getColumnIndex("Data", convertedData);
@@ -178,22 +207,14 @@ const addManualTestSteps = () => {
         }
         let jsonString = secondSection ? `[{${formatJsonString(secondSection)}}]` : '[]';
         
-        // Parse the JSON string
-        let jsonObject;
-
-        try {
-            jsonObject = JSON.parse(jsonString);
-        } catch (error) {
+        const {jsonObject, error} = parseJsonString(jsonString);
+        if (error[0]) {
             // Add errors to the interface
-            addErrorToHtml(issueKey, error, jsonString);
-
+            addParsingErrorToHtml(issueKey, error[1], jsonString);
             // Show errors in the console
             console.log(`Issue ${issueKey}: Cannot parse JSON data (Custom field (Manual Test Steps))`);
-            console.log(error);
+            console.log(error[1]);
             console.log(jsonString);
-
-            // Reinitialize jsonObject
-            jsonObject = [];
         }
 
         // Add test steps data (columns: Action, Data, Result) to the final array
