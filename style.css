@@ -62,6 +62,11 @@ form {
     margin: 20px 0;
 }
 
+.form-element:last-child {
+    display: flex;
+    align-items: center;
+}
+
 label {
     text-transform: uppercase;
     font-size: 12px;
@@ -76,6 +81,28 @@ input[type="submit"] {
     text-transform: uppercase;
     font-size: 12px;
 }
+
+div#spinner {
+    margin-left: 15px;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, .3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 0.5s ease infinite;
+    -webkit-animation: spin 1s ease infinite;
+    /* display: none; */
+}
+@keyframes spin {
+    to {
+      -webkit-transform: rotate(360deg);
+    }
+  }
+  @-webkit-keyframes spin {
+    to {
+      -webkit-transform: rotate(360deg);
+    }
+  }
 
 textarea {
     font-size: 10px;
@@ -94,4 +121,8 @@ div#logs {
 div.error {
     margin-top: 20px;
     margin-bottom: 20px;
+}
+
+.display-none {
+    display: none;
 }

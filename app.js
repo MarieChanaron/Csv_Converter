@@ -9,9 +9,12 @@ window.onload = () => {
 
 const handleSubmit = async(event) => {
     event.preventDefault();
+    const spinner = document.getElementById('spinner');
+    spinner.classList.remove('display-none');
     const [file] = document.getElementById('file-input').files;
     const fileContent = await readFile(file);
     const twoDArray = processData(fileContent);
+    spinner.style.display = 'none';
     writeCsv(twoDArray);
     const confirmationDiv = document.getElementById('confirmation');
     if (twoDArray.length > 1) confirmationDiv.removeAttribute('hidden');
