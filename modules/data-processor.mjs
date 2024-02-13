@@ -1,7 +1,7 @@
 let rowsArray = [];
 let twoDArray = [];
 let convertedData = [];
-let columnsCount = 0;
+let columnsCount = {};
 
 
 /*
