@@ -178,7 +178,7 @@ const addManualTestSteps = () => {
         }
 
         // Add the test steps (Action, Data, Result)
-        const firstSection = rowsArray[i].split('[{')[1];
+        const firstSection = rowsArray[i] && rowsArray[i].split('[{')[1];
         let secondSection;
         if (firstSection) {
             secondSection = firstSection.split('}]')[0];

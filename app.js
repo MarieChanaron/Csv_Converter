@@ -29,5 +29,5 @@ const handleClick = () => {
         errorsDiv.removeChild(errorsDiv.firstChild);
     }
     const confirmationDiv = document.getElementById('confirmation');
-    confirmationDiv.setAttribute('hidden');
+    confirmationDiv.setAttribute('hidden', 'false');
 }
