@@ -192,10 +192,36 @@ const addManualTestSteps = () => {
         try {
             jsonObject = JSON.parse(jsonString);
         } catch (error) {
+
+            const logsDivElement = document.getElementById('logs');
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error';
+
+            const errorTitle = document.createElement('h3');
+            errorTitle.innerHTML = `Erreur pour <span>${issueKey}</span> : `;
+
+            const firstParagraph = document.createElement('p');
+            firstParagraph.innerText = 'Impossible de parser les données JSON de la colonne "Custom field (Manual Test Steps)"';
+            const secondParagraph = document.createElement('p');
+            secondParagraph.innerHTML = `Message : <span>${error}</span>`;
+
+            const textarea = document.createElement('textarea');
+            textarea.innerText = jsonString;
+
+            errorDiv.appendChild(errorTitle);
+            errorDiv.appendChild(firstParagraph);
+            errorDiv.appendChild(secondParagraph);
+            errorDiv.appendChild(textarea);
+
+            logsDivElement.appendChild(errorDiv);
+
+            // Show the same errors in the console
             console.log(error);
             console.log(`Cannot parse JSON data for issue ${issueKey}`);
             console.log(`Cannot read the test steps (action/data/result columns) for the issue ${issueKey}`);
             console.log(jsonString);
+
+            // Reinitialize jsonObject
             jsonObject = [];
         }
 
