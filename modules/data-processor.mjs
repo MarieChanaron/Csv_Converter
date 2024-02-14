@@ -66,6 +66,7 @@ const convertData = ({rows, columns}) => {
 }
 
 
+// Indicate to the user that a column is missing in the first table
 const addMissingColumnToHtml = header => {
     const p = document.createElement('p');
     p.innerText = `La colonne ${header} n'existe pas dans le fichier d'origine.`;
@@ -74,6 +75,7 @@ const addMissingColumnToHtml = header => {
 }
 
 
+// This function copies the values of the first table into the new table.
 const copyPasteValues = (inputHeader, outputHeader) => {
     let indexCol = getColumnIndex(inputHeader);
     if (inputHeader && indexCol === -1) {
@@ -86,7 +88,7 @@ const copyPasteValues = (inputHeader, outputHeader) => {
         const length = convertedData[0].length; // To place the new column just after the previous one
         convertedData[0][length] = outputHeader;
 
-        for (let indexLine = 1; indexLine < twoDArray.length; indexLine ++) {
+        for (let indexLine = 1; indexCol !== -1 && indexLine < twoDArray.length; indexLine ++) {
             let value = twoDArray[indexLine][indexCol];
             if (typeof value === 'string') value = doNotParse(value);
             convertedData[indexLine][length] = value ? value : ''; // Add an empty string if there is no value (to avoid bugs later on when adding test steps)
@@ -255,6 +257,8 @@ const addManualTestSteps = () => {
 }
 
 
+// Return the index of the column in the table (by default the first table if there is only one argument)
+// Returns -1 if the column has not been found
 const getColumnIndex = (columnName, tableName = twoDArray) => {
     const header = tableName[0];
     return header.indexOf(columnName);
