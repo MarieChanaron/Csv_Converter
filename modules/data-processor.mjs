@@ -72,10 +72,10 @@ const copyPasteValues = (inputHeader, outputHeader) => {
         const length = convertedData[0].length; // To place the new column just after the previous one
         convertedData[0][length] = outputHeader;
 
-        for (let indexLine = 1; indexCol !== -1 && indexLine < initialData.length; indexLine ++) {
-            let value = initialData[indexLine][indexCol];
+        for (let rowIndex = 1; indexCol !== -1 && rowIndex < initialData.length; rowIndex ++) {
+            let value = initialData[rowIndex][indexCol];
             if (typeof value === 'string') value = doNotParse(value);
-            convertedData[indexLine][length] = value ? value : ''; // Add an empty string if there is no value (to avoid bugs later on when adding test steps)
+            convertedData[rowIndex][length] = value ? value : ''; // Add an empty string if there is no value (to avoid bugs later on when adding test steps)
         }
         indexCol ++;
     }
@@ -89,8 +89,8 @@ const doNotParse = string => {
 }
 
 
-// Find the position of the issue (the number of the line) in the new table
-const getIssueLineInNewTable = issueKey => {
+// Find the position of the issue in the new table
+const getIssueIndexInNewTable = issueKey => {
     for (let i = 0; i < convertedData.length; i++) {
         if (convertedData[i][0] === `"${issueKey}"`) {
             return i;
@@ -100,13 +100,13 @@ const getIssueLineInNewTable = issueKey => {
 }
 
 
-// Insert new lines inside of an array
-// linesArray: Array containing all of the lines to add in the table
-// Position: index of the new line
-const insertNewLines = (linesArray, position) => {
+// Insert new entries inside of an array
+// rowsArray: Array containing all of the rows to add in the table
+// Position: index of the row where we want to start to insert the new rows
+const insertNewRows = (rowsArray, position) => {
     const firstPart = convertedData.slice(0, position);
     const secondPart = convertedData.slice(position);
-    convertedData = firstPart.concat(linesArray).concat(secondPart);
+    convertedData = firstPart.concat(rowsArray).concat(secondPart);
 }
 
 
@@ -119,9 +119,9 @@ const addManualTestSteps = testStepsIndex => {
     
     for (let i = 1; i < initialData.length; i ++) {
 
-        const newLines = [];
+        const newRows = [];
         let issueKey = initialData[i][0];
-        let issueIndex = getIssueLineInNewTable(issueKey);
+        let issueIndex = getIssueIndexInNewTable(issueKey);
 
         // Add the TCID
         if (issueKey.length > 0 && convertedData[issueIndex]) {
@@ -136,23 +136,23 @@ const addManualTestSteps = testStepsIndex => {
             const action = doNotParse(fields['Action']);
             const data = doNotParse(fields['Data']);
             const result = doNotParse(fields['Expected Result']);
-            if (pos === 0) { // Add the first test step directly in the issue line
+            if (pos === 0) { // Add the first test step directly in the issue row
                 convertedData[issueIndex][actionIndex] = action;
                 convertedData[issueIndex][dataIndex] = data;
                 convertedData[issueIndex][resultIndex] = result;
-            } else { // For the additional test steps: make new lines
-                const newLine = new Array(convertedData[0].length);
-                newLine.fill('');
-                newLine[actionIndex] = action;
-                newLine[dataIndex] = data;
-                newLine[resultIndex] = result;
-                newLine[tcidIndex] = `"${i}"`; // Add the TCID in the new line
-                newLines.push(newLine);
+            } else { // For the additional test steps: make new rows
+                const newRow = new Array(convertedData[0].length);
+                newRow.fill('');
+                newRow[actionIndex] = action;
+                newRow[dataIndex] = data;
+                newRow[resultIndex] = result;
+                newRow[tcidIndex] = `"${i}"`; // Add the TCID in the new row
+                newRows.push(newRow);
             }
         });
 
-        // Add the new lines to the convertedData array
-        insertNewLines(newLines, issueIndex + 1);
+        // Add the new rows to the convertedData array
+        insertNewRows(newRows, issueIndex + 1);
     }
 }
 
