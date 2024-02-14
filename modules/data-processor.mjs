@@ -56,16 +56,6 @@ const formatAsCellContent = string => {
 }
 
 
-// Find the position of the issue in the new table
-const getIssueIndexInNewTable = issueKey => {
-    for (let i = 0; i < convertedData.length; i++) {
-        if (convertedData[i][0] === `"${issueKey}"`) {
-            return i;
-        }
-    }
-    return -1;
-}
-
 
 // Insert new entries inside of an array
 // rowsArray: Array containing all of the rows to add in the table
@@ -83,12 +73,13 @@ const addManualTestSteps = testStepsIndex => {
     const actionIndex = getColumnIndex('Action', convertedData);
     const dataIndex = getColumnIndex('Data', convertedData);
     const resultIndex = getColumnIndex('Result', convertedData);
+    let issueIndex = 1;
     
     for (let i = 1; i < initialData.length; i ++) {
 
+        // addTestSteps(i, testStepsIndex);
         const newRows = [];
         let issueKey = initialData[i][0];
-        let issueIndex = getIssueIndexInNewTable(issueKey);
 
         // Add the TCID
         // The TCID is added outside of the foreach loop below because some issues may not have some test steps
@@ -121,6 +112,8 @@ const addManualTestSteps = testStepsIndex => {
 
         // Add the new rows to the convertedData array
         insertNewRows(newRows, issueIndex + 1);
+
+        issueIndex += newRows.length ? newRows.length + 1 : 1;
     }
 }
 
