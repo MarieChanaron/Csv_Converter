@@ -1,7 +1,7 @@
-import readFile from "./modules/csv-reader.mjs";
-import writeCsv from "./modules/csv-maker.mjs";
-import parseData from "./modules/csv-parser.mjs";
-import convertData from "./modules/data-processor.mjs";
+import readFile from "./modules/csv-reader.js";
+import writeCsv from "./modules/csv-maker.js";
+import parseData from "./modules/csv-parser.js";
+import convertData from "./modules/data-processor.js";
 
 
 const showSpinner= () => {
@@ -41,10 +41,12 @@ const showLogs = (data) => {
 
 window.onload = () => {
     document.querySelector('form').onsubmit = handleSubmit;
+    // document.querySelector('input[type="submit"]').onclick = handleSubmit;
 }
 
 
 const handleSubmit = async(event) => {
+    // document.querySelector('form').preventDefault();
     event.preventDefault();
     const [file] = document.getElementById('file-input').files;
     if (!file) {

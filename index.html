@@ -7,7 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
     <title>Conversion CSV XRAY</title>
-    <script type="module" src="app.js" async></script>
+    <script defer type="module" src="./app.js"></script>
+    <script src="./configuration/columns-matching.js"></script>
 </head>
 
 <body>
@@ -15,7 +16,7 @@
     <h1>Outil de conversion de fichier CSV pour migration des données XRAY</h1>
     <p id="first-step">Avant de charger le fichier CSV, penser à l'ouvrir avec Excel et à le sauvegarder (Ctrl + S).</p>
 
-    <form action="#">
+    <form>
         <div class="form-element">
             <label for="file-input">Fichier CSV : </label>
             <input type="file" name="file" id="file-input" accept=".csv,.txt,.xls,.xlsx">
