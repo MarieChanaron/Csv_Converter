@@ -145,7 +145,7 @@ const convertData = parsedData => {
         copyPasteValues(headers[header], header);
     }
 
-    const testStepsIndex = getColumnIndex('Custom field (Manual Test Steps)');
+    const testStepsIndex = getColumnIndex(TEST_STEPS_HEADER);
     addManualTestSteps(testStepsIndex);
 
     return convertedData;

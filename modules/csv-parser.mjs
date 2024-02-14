@@ -1,4 +1,4 @@
-let testStepsIndex; // Store the position of the test steps json data (Custom field (Manual Test Steps) column), starting from zero
+let testStepsIndex; // Store the position of the test steps json data, starting from zero
 
 
 // Show the logs of the json parsing errors to the interface
@@ -14,7 +14,7 @@ const addParsingErrorToHtml = (issueKey, error, jsonString) => {
     
     // Add a small paragraph to inform that the json object cannot be parsed
     const firstParagraph = document.createElement('p');
-    firstParagraph.innerText = 'Impossible de parser les données JSON de la colonne "Custom field (Manual Test Steps)"';
+    firstParagraph.innerText = `Impossible de parser les données JSON de la colonne ${TEST_STEPS_HEADER}`;
     // Add a small paragraph to log the exact error message returned by the browser
     const secondParagraph = document.createElement('p');
     secondParagraph.innerHTML = `Message : <span>${error}</span>`;
@@ -84,7 +84,7 @@ const parseJsonData = (row, issueKey) => {
         // Add errors to the interface
         addParsingErrorToHtml(issueKey, error[1], jsonString);
         // Show errors in the console
-        console.log(`Issue ${issueKey}: Cannot parse JSON data (Custom field (Manual Test Steps))`);
+        console.log(`Issue ${issueKey}: Cannot parse JSON data (${TEST_STEPS_HEADER})`);
         console.log(error[1]);
         console.log(jsonString);
     }
@@ -93,7 +93,7 @@ const parseJsonData = (row, issueKey) => {
 
 
 const findTestStepsIndex = (columns, cellContent) => {
-    if (cellContent === 'Custom field (Manual Test Steps)') {
+    if (cellContent === TEST_STEPS_HEADER) {
         testStepsIndex = columns.indexOf(cellContent);
     }
 }

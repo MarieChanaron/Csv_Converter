@@ -31,3 +31,5 @@ const headers = {
     "Environment": "Environment",
     "Created": "Created"
 }
+
+const TEST_STEPS_HEADER = 'Custom field (Manual Test Steps)'
