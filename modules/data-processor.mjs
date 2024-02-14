@@ -38,6 +38,9 @@ const headers = {
 }
 
 
+// This function returns an object where:
+// Each key is the name of a column in the first table
+// Values are integers representing the number of times this column is found in the first table
 const countHeaders = () => {
     let headersCount = twoDArray[0].reduce((accumulator, currentValue) => {
         return accumulator[currentValue] ? ++accumulator[currentValue] :
@@ -45,24 +48,6 @@ const countHeaders = () => {
                                             accumulator
     }, {});
     return headersCount;
-}
-
-
-const convertData = ({rows, columns}) => {
-    rowsArray = rows;
-    twoDArray = columns;
-    columnsCount = countHeaders();
-
-    for (let i = 0; i < twoDArray.length; i ++) {
-        convertedData[i] = [];
-    }
-
-    for (const header in headers) {
-        copyPasteValues(headers[header], header);
-    }
-
-    addManualTestSteps();
-    return convertedData;
 }
 
 
@@ -262,6 +247,26 @@ const addManualTestSteps = () => {
 const getColumnIndex = (columnName, tableName = twoDArray) => {
     const header = tableName[0];
     return header.indexOf(columnName);
+}
+
+
+// The default function
+const convertData = ({rows, columns}) => {
+    // Initialize global variables used throughout our functions
+    rowsArray = rows;
+    twoDArray = columns; // Contains all the data parsed in the CSV
+    columnsCount = countHeaders();
+
+    for (let i = 0; i < twoDArray.length; i ++) {
+        convertedData[i] = []; // To tell that convertedData is going to be a 2 dimensions array (to avoid some bugs linked to data types)
+    }
+
+    for (const header in headers) {
+        copyPasteValues(headers[header], header);
+    }
+
+    addManualTestSteps();
+    return convertedData;
 }
 
 
