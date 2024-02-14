@@ -118,6 +118,7 @@ const addManualTestSteps = () => {
     actionIndex = getColumnIndex('Action', convertedData);
     dataIndex = getColumnIndex('Data', convertedData);
     resultIndex = getColumnIndex('Result', convertedData);
+    // Get index of the column in the table of origin
     testStepsIndex = getColumnIndex(TEST_STEPS_HEADER);
 
     let issueIndex = 1;
