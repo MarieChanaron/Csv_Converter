@@ -1,5 +1,5 @@
 import readFile from "./modules/csv-reader.mjs";
-import writeCsv from "./modules/csv-maker.mjs";
+import writeCsv from "./modules/csv-writer.mjs";
 import parseData from "./modules/csv-parser.mjs";
 import convertData from "./modules/data-processor.mjs";
 
