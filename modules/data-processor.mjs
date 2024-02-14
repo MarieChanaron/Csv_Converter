@@ -25,7 +25,7 @@ const countHeaders = () => {
 // Indicate to the user that a column is missing in the first table
 const addMissingColumnToHtml = header => {
     const p = document.createElement('p');
-    p.innerText = `La colonne ${header} n'existe pas dans le fichier d'origine.`;
+    p.innerHTML = `La colonne <i>${header}</i> n'existe pas dans le fichier d'origine.`;
     const errorsDivElement = document.getElementById('errors');
     errorsDivElement.appendChild(p);
 }
