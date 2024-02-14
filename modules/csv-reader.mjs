@@ -1,4 +1,4 @@
-// This finction takes in the file and returns the content of the file as a string
+// This fonction takes in the file and returns the content of the file as a string
 const readFile = async(file) => {
     
     return new Promise((resolve, reject) => {
