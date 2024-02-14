@@ -32,7 +32,8 @@ const copyPasteValues = (inputHeader, outputHeader) => {
         console.log(`La colonne ${inputHeader} n'existe pas dans le fichier d'origine.`);
         addMissingColumnToHtml(inputHeader);
     }
-    let count = columnsCount[inputHeader];
+
+    let count = columnsCount[inputHeader]; // Number of times a column should be added
     
     for (let i = 0; (count && i < columnsCount[inputHeader]) || (!count && i < 1); i ++) {
         const length = convertedData[0].length; // To place the new column just after the previous one
@@ -40,7 +41,7 @@ const copyPasteValues = (inputHeader, outputHeader) => {
 
         for (let rowIndex = 1; indexCol !== -1 && rowIndex < initialData.length; rowIndex ++) {
             let value = initialData[rowIndex][indexCol];
-            if (typeof value === 'string') value = formatAsCellContent(value);
+            if (typeof value === 'string') value = doNotParse(value);
             convertedData[rowIndex][length] = value ? value : ''; // Add an empty string if there is no value (to avoid bugs later on when adding test steps)
         }
         indexCol ++;
@@ -49,7 +50,7 @@ const copyPasteValues = (inputHeader, outputHeader) => {
 
 
 // Do not parse \n, \r and semicolons inside of a single cell
-const formatAsCellContent = string => {
+const doNotParse = string => {
     string = string.replace(/"/g, '""');
     return `"${string}"`;
 }
@@ -90,7 +91,7 @@ const addManualTestSteps = testStepsIndex => {
         let issueIndex = getIssueIndexInNewTable(issueKey);
 
         // Add the TCID
-        // The TCID is added outside of the foreach loop below because some issues may not have some test steps data
+        // The TCID is added outside of the foreach loop below because some issues may not have some test steps
         if (issueKey.length > 0 && convertedData[issueIndex]) {
             convertedData[issueIndex][tcidIndex] = `"${i}"`;
         }
@@ -100,9 +101,9 @@ const addManualTestSteps = testStepsIndex => {
         // Add test steps data (columns: Action, Data, Result) to the final array
         jsonObject.forEach((testStep, pos) => {
             const fields = testStep.fields;
-            const action = formatAsCellContent(fields['Action']);
-            const data = formatAsCellContent(fields['Data']);
-            const result = formatAsCellContent(fields['Expected Result']);
+            const action = doNotParse(fields['Action']);
+            const data = doNotParse(fields['Data']);
+            const result = doNotParse(fields['Expected Result']);
             if (pos === 0) { // Add the first test step directly in the issue row
                 convertedData[issueIndex][actionIndex] = action;
                 convertedData[issueIndex][dataIndex] = data;
