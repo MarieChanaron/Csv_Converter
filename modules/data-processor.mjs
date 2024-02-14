@@ -78,10 +78,10 @@ const insertNewRows = (rowsArray, position) => {
 
 const addManualTestSteps = testStepsIndex => {
     // Retrieval of the column positions of Action, Data, Result and TCID columns (in the new table)
+    const tcidIndex = getColumnIndex('TCID', convertedData);
     const actionIndex = getColumnIndex('Action', convertedData);
     const dataIndex = getColumnIndex('Data', convertedData);
     const resultIndex = getColumnIndex('Result', convertedData);
-    const tcidIndex = getColumnIndex('TCID', convertedData);
     
     for (let i = 1; i < initialData.length; i ++) {
 
@@ -90,6 +90,7 @@ const addManualTestSteps = testStepsIndex => {
         let issueIndex = getIssueIndexInNewTable(issueKey);
 
         // Add the TCID
+        // The TCID is added outside of the foreach loop below because some issues may not have some test steps data
         if (issueKey.length > 0 && convertedData[issueIndex]) {
             convertedData[issueIndex][tcidIndex] = `"${i}"`;
         }

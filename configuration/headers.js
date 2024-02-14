@@ -32,4 +32,7 @@ const headers = {
     "Created": "Created"
 }
 
+
+// This single column corresponds to 3 columns in the final table:
+// Action / Data / Result
 const TEST_STEPS_HEADER = 'Custom field (Manual Test Steps)'
