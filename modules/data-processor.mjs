@@ -66,10 +66,19 @@ const convertData = ({rows, columns}) => {
 }
 
 
+const addMissingColumnToHtml = header => {
+    const p = document.createElement('p');
+    p.innerText = `La colonne ${header} n'existe pas dans le fichier d'origine.`;
+    const errorsDivElement = document.getElementById('errors');
+    errorsDivElement.appendChild(p);
+}
+
+
 const copyPasteValues = (inputHeader, outputHeader) => {
     let indexCol = getColumnIndex(inputHeader);
     if (inputHeader && indexCol === -1) {
         console.log(`La colonne ${inputHeader} n'existe pas dans le fichier d'origine.`);
+        addMissingColumnToHtml(inputHeader);
     }
     let count = columnsCount[inputHeader];
     
@@ -124,32 +133,32 @@ const insertNewLines = (linesArray, position) => {
 
 // Show the logs of the json parsing errors to the interface
 const addParsingErrorToHtml = (issueKey, error, jsonString) => {
-    const errorsDivElement = document.getElementById('errors');
     
     // Create a div to contain the parsing error for a particular issue
     const errorDiv = document.createElement('div');
     errorDiv.className = 'error';
-
+    
     // Add a small title to indicate which issue key is concerned
     const errorTitle = document.createElement('h3');
     errorTitle.innerHTML = `Erreur pour <span>${issueKey}</span> : `;
-
+    
     // Add a small paragraph to inform that the json object cannot be parsed
     const firstParagraph = document.createElement('p');
     firstParagraph.innerText = 'Impossible de parser les données JSON de la colonne "Custom field (Manual Test Steps)"';
     // Add a small paragraph to log the exact error message returned by the browser
     const secondParagraph = document.createElement('p');
     secondParagraph.innerHTML = `Message : <span>${error}</span>`;
-
+    
     // Add a textarea (with an inner scroll) to display the content of the json object that cannot be parsed
     const textarea = document.createElement('textarea');
     textarea.innerText = jsonString;
-
+    
     // Add the error to the DOM
     errorDiv.appendChild(errorTitle);
     errorDiv.appendChild(firstParagraph);
     errorDiv.appendChild(secondParagraph);
     errorDiv.appendChild(textarea);
+    const errorsDivElement = document.getElementById('errors');
     errorsDivElement.appendChild(errorDiv);
     
     // Show the logs
