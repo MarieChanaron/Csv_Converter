@@ -70,7 +70,7 @@ const formatJsonString = jsonString => {
 // Note: Because the 2 dimensions array contains the json string WITHOUT quotes, it's not possible to read the json string.
 // It was complicated to add quotes manually in this json string so the solution was to use the function split() that automatically adds quotes.
 // So we get the json string from the rowsArray and not from the twoDArray
-const parseJsonData = row => {
+const parseJsonData = (row, issueKey) => {
     const firstSection = row.split('[{')[1];
     let secondSection;
     if (firstSection) {
@@ -82,9 +82,9 @@ const parseJsonData = row => {
     const {jsonObject, error} = parseJsonString(jsonString);
     if (error[0]) {
         // Add errors to the interface
-        addParsingErrorToHtml('issueKey', error[1], jsonString);
+        addParsingErrorToHtml(issueKey, error[1], jsonString);
         // Show errors in the console
-        console.log(`Issue ${'issueKey'}: Cannot parse JSON data (Custom field (Manual Test Steps))`);
+        console.log(`Issue ${issueKey}: Cannot parse JSON data (Custom field (Manual Test Steps))`);
         console.log(error[1]);
         console.log(jsonString);
     }
@@ -135,7 +135,7 @@ const parseData = content => {
     rowsArray.forEach((row, index) => {
         const columnsArray = parseRowIntoColumns(row);
         if (index !== 0 && testStepsIndex) {
-            const jsonObject = parseJsonData(row);
+            const jsonObject = parseJsonData(row, columnsArray[0]);
             columnsArray[testStepsIndex] = jsonObject;
         }
         twoDArray.push(columnsArray);
