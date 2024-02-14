@@ -101,24 +101,17 @@ const parseRowIntoColumns = row => {
     for (let i = 0; i < row.length; i ++) {
         const char = row[i];
 
-        switch (char) {
-            case '"':
-                withinQuotes = !withinQuotes;
-                break;
-            case COLUMN_SEPARATOR:
-                if (!withinQuotes) { // If the semicolons are within quotes then it's part of the text and not a column separator
-                    const col = currentColumn.join('');
-                    columnsArray.push(col);
-                    if (!testStepsIndex && col === 'Custom field (Manual Test Steps)') {
-                        testStepsIndex = columnsArray.indexOf(col);
-                    }
-                    currentColumn = [];
-                } else {
-                    currentColumn.push(char);
-                }
-                break;
-            default:
-                currentColumn.push(char);
+        if (char === '"') {
+            withinQuotes = !withinQuotes;
+        } else if (withinQuotes || char !== COLUMN_SEPARATOR) {
+            currentColumn.push(char);
+        } else {
+            const col = currentColumn.join('');
+            columnsArray.push(col);
+            if (!testStepsIndex && col === 'Custom field (Manual Test Steps)') {
+                testStepsIndex = columnsArray.indexOf(col);
+            }
+            currentColumn = [];
         }
     }
     columnsArray.push(currentColumn); // Push the last column
