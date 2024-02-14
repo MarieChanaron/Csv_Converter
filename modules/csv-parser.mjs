@@ -92,7 +92,14 @@ const parseJsonData = (row, issueKey) => {
 }
 
 
-// Separate our columns by semicolon
+const findTestStepsIndex = (columns, cellContent) => {
+    if (cellContent === 'Custom field (Manual Test Steps)') {
+        testStepsIndex = columns.indexOf(cellContent);
+    }
+}
+
+
+// Parse our columns by COLUMN_SEPARATOR
 const parseRowIntoColumns = row => {
     const columnsArray = [];
     let withinQuotes = false;
@@ -106,11 +113,9 @@ const parseRowIntoColumns = row => {
         } else if (withinQuotes || char !== COLUMN_SEPARATOR) {
             currentColumn.push(char);
         } else {
-            const col = currentColumn.join('');
-            columnsArray.push(col);
-            if (!testStepsIndex && col === 'Custom field (Manual Test Steps)') {
-                testStepsIndex = columnsArray.indexOf(col);
-            }
+            const cell = currentColumn.join('');
+            columnsArray.push(cell);
+            if (!testStepsIndex) findTestStepsIndex(columnsArray, cell);
             currentColumn = [];
         }
     }
