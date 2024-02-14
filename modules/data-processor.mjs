@@ -1,5 +1,5 @@
-let initialData = [];
-let convertedData = [];
+let initialData = [[]];
+let convertedData = [[]];
 let columnsCount = {};
 
 let tcidIndex;
@@ -48,6 +48,7 @@ const copyPasteValues = (inputHeader, outputHeader) => {
         for (let rowIndex = 1; indexCol !== -1 && rowIndex < initialData.length; rowIndex ++) {
             let value = initialData[rowIndex][indexCol];
             if (typeof value === 'string') value = formatAsCellContent(value);
+            if (!convertedData[rowIndex]) convertedData[rowIndex] = [];
             convertedData[rowIndex][length] = value ? value : ''; // Add an empty string if there is no value (to avoid bugs later on when adding test steps)
         }
         indexCol ++;
@@ -143,10 +144,6 @@ const convertData = parsedData => {
     // Initialize global variables used throughout our functions
     initialData = parsedData; // Contains all the data parsed in the CSV
     columnsCount = countHeaders();
-
-    for (let i = 0; i < initialData.length; i ++) {
-        convertedData[i] = []; // Fill convertedData with empty arrays to indicate the browser that convertedData is going to be a 2 dimensions array (to avoid some bugs linked to data types later on)
-    }
 
     for (const header in headers) {
         copyPasteValues(headers[header], header);
