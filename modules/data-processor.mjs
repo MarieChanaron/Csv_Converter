@@ -39,7 +39,7 @@ const headers = {
 
 
 // This function returns an object where:
-// Each key is the name of a column in the first table
+// Each key is the name of each column in the first table (all the columns and not only the ones needed)
 // Values are integers representing the number of times this column is found in the first table
 const countHeaders = () => {
     let headersCount = twoDArray[0].reduce((accumulator, currentValue) => {

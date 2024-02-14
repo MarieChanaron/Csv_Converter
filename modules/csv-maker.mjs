@@ -1,3 +1,4 @@
+// This function generates the output CSV file
 const writeCsv = twoDArray => {
 
     // Transform the 2D array into a string 
