@@ -83,7 +83,8 @@ const copyPasteTestSteps = (indexOrigin, indexDestination) => {
         
         // Add test steps data (columns: Action, Data, Result) to the final array
         const newRows = [];
-        const jsonObject = initialData[indexOrigin][testStepsIndex];
+        let jsonObject = initialData[indexOrigin][testStepsIndex];
+        if (!jsonObject) jsonObject = [];
         
         jsonObject.forEach((testStep, pos) => {
             const {fields} = testStep;
