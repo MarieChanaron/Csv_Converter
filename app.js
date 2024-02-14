@@ -55,8 +55,8 @@ const handleSubmit = async(event) => {
         hideLogs();
 
         const fileContent = await readFile(file);
-        const {rows, columns} = parseData(fileContent);
-        const convertedData = convertData({rows, columns});
+        const parsedData = parseData(fileContent);
+        const convertedData = convertData(parsedData);
         writeCsv(convertedData);
 
         hideSpinner();

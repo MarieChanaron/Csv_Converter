@@ -1,5 +1,4 @@
-let rowsArray = [];
-let twoDArray = [];
+let initialData = [];
 let convertedData = [];
 let columnsCount = {};
 
@@ -42,7 +41,7 @@ const headers = {
 // Each key is the name of each column in the first table (all the columns and not only the ones needed)
 // Values are integers representing the number of times this column is found in the first table
 const countHeaders = () => {
-    let headersCount = twoDArray[0].reduce((accumulator, currentValue) => {
+    let headersCount = initialData[0].reduce((accumulator, currentValue) => {
         return accumulator[currentValue] ? ++accumulator[currentValue] :
                                             accumulator[currentValue] = 1,
                                             accumulator
@@ -73,20 +72,13 @@ const copyPasteValues = (inputHeader, outputHeader) => {
         const length = convertedData[0].length; // To place the new column just after the previous one
         convertedData[0][length] = outputHeader;
 
-        for (let indexLine = 1; indexCol !== -1 && indexLine < twoDArray.length; indexLine ++) {
-            let value = twoDArray[indexLine][indexCol];
+        for (let indexLine = 1; indexCol !== -1 && indexLine < initialData.length; indexLine ++) {
+            let value = initialData[indexLine][indexCol];
             if (typeof value === 'string') value = doNotParse(value);
             convertedData[indexLine][length] = value ? value : ''; // Add an empty string if there is no value (to avoid bugs later on when adding test steps)
         }
         indexCol ++;
     }
-}
-
-
-// Make the json string compatible with the json format to be able to read it as an object
-const formatJsonString = jsonString => {
-    const newJsonString = jsonString.replace(/""/g, '"'); // Replace "" by "
-    return newJsonString;
 }
 
 
@@ -118,74 +110,17 @@ const insertNewLines = (linesArray, position) => {
 }
 
 
-// Show the logs of the json parsing errors to the interface
-const addParsingErrorToHtml = (issueKey, error, jsonString) => {
-    
-    // Create a div to contain the parsing error for a particular issue
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'error';
-    
-    // Add a small title to indicate which issue key is concerned
-    const errorTitle = document.createElement('h3');
-    errorTitle.innerHTML = `Erreur pour <span>${issueKey}</span> : `;
-    
-    // Add a small paragraph to inform that the json object cannot be parsed
-    const firstParagraph = document.createElement('p');
-    firstParagraph.innerText = 'Impossible de parser les données JSON de la colonne "Custom field (Manual Test Steps)"';
-    // Add a small paragraph to log the exact error message returned by the browser
-    const secondParagraph = document.createElement('p');
-    secondParagraph.innerHTML = `Message : <span>${error}</span>`;
-    
-    // Add a textarea (with an inner scroll) to display the content of the json object that cannot be parsed
-    const textarea = document.createElement('textarea');
-    textarea.innerText = jsonString;
-    
-    // Add the error to the DOM
-    errorDiv.appendChild(errorTitle);
-    errorDiv.appendChild(firstParagraph);
-    errorDiv.appendChild(secondParagraph);
-    errorDiv.appendChild(textarea);
-    const errorsDivElement = document.getElementById('errors');
-    errorsDivElement.appendChild(errorDiv);
-    
-    // Show the logs
-    const logsDiv = document.getElementById('logs');
-    logsDiv.removeAttribute('hidden');
-}
-
-
-// Convert a json string into a json object
-const parseJsonString = jsonString => {
-    let jsonObject;
-    let error = false;
-    let message = '';
-
-    try {
-        jsonObject = JSON.parse(jsonString);
-    } catch (errorMessage) {
-        error = true;
-        message = errorMessage;
-        jsonObject = [];
-    }
-
-    return {
-        jsonObject, 
-        error: [error, message]
-    };
-}
-
-
-const addManualTestSteps = () => {
+const addManualTestSteps = testStepsIndex => {
     // Retrieval of the column positions of Action, Data, Result and TCID columns (in the new table)
-    const actionIndex = getColumnIndex("Action", convertedData);
-    const dataIndex = getColumnIndex("Data", convertedData);
-    const resultIndex = getColumnIndex("Result", convertedData);
-    const tcidIndex = getColumnIndex("TCID", convertedData);
+    const actionIndex = getColumnIndex('Action', convertedData);
+    const dataIndex = getColumnIndex('Data', convertedData);
+    const resultIndex = getColumnIndex('Result', convertedData);
+    const tcidIndex = getColumnIndex('TCID', convertedData);
     
-    for (let i = 1; i < twoDArray.length; i ++) {
+    for (let i = 1; i < initialData.length; i ++) {
 
         const newLines = [];
-        let issueKey = twoDArray[i][0];
+        let issueKey = initialData[i][0];
         let issueIndex = getIssueLineInNewTable(issueKey);
 
         // Add the TCID
@@ -193,27 +128,7 @@ const addManualTestSteps = () => {
             convertedData[issueIndex][tcidIndex] = `"${i}"`;
         }
 
-        // Parse the rows array to extract the json string containing the test steps
-        // Note: Because the 2 dimensions array contains the json string WITHOUT quotes, it's not possible to read the json string.
-        // It was complicated to add quotes manually in this json string so the solution was to use the function split() that automatically adds quotes.
-        // So we get the json string from the rowsArray and not from the twoDArray
-        const firstSection = rowsArray[i] && rowsArray[i].split('[{')[1];
-        let secondSection;
-        if (firstSection) {
-            secondSection = firstSection.split('}]')[0];
-            if (secondSection[secondSection.length - 1] === ':') secondSection += '""""';
-        }
-        let jsonString = secondSection ? `[{${formatJsonString(secondSection)}}]` : '[]';
-        
-        const {jsonObject, error} = parseJsonString(jsonString);
-        if (error[0]) {
-            // Add errors to the interface
-            addParsingErrorToHtml(issueKey, error[1], jsonString);
-            // Show errors in the console
-            console.log(`Issue ${issueKey}: Cannot parse JSON data (Custom field (Manual Test Steps))`);
-            console.log(error[1]);
-            console.log(jsonString);
-        }
+        const jsonObject = initialData[i][testStepsIndex];
 
         // Add test steps data (columns: Action, Data, Result) to the final array
         jsonObject.forEach((testStep, pos) => {
@@ -244,28 +159,29 @@ const addManualTestSteps = () => {
 
 // Return the index of the column in the table (by default the first table if there is only one argument)
 // Returns -1 if the column has not been found
-const getColumnIndex = (columnName, tableName = twoDArray) => {
+const getColumnIndex = (columnName, tableName = initialData) => {
     const header = tableName[0];
     return header.indexOf(columnName);
 }
 
 
 // The default function
-const convertData = ({rows, columns}) => {
+const convertData = parsedData => {
     // Initialize global variables used throughout our functions
-    rowsArray = rows;
-    twoDArray = columns; // Contains all the data parsed in the CSV
+    initialData = parsedData; // Contains all the data parsed in the CSV
     columnsCount = countHeaders();
 
-    for (let i = 0; i < twoDArray.length; i ++) {
-        convertedData[i] = []; // To tell that convertedData is going to be a 2 dimensions array (to avoid some bugs linked to data types)
+    for (let i = 0; i < initialData.length; i ++) {
+        convertedData[i] = []; // Fill convertedData with empty arrays to indicate the browser that convertedData is going to be a 2 dimensions array (to avoid some bugs linked to data types later on)
     }
 
     for (const header in headers) {
         copyPasteValues(headers[header], header);
     }
 
-    addManualTestSteps();
+    const testStepsIndex = getColumnIndex('Custom field (Manual Test Steps)');
+    addManualTestSteps(testStepsIndex);
+
     return convertedData;
 }
 
