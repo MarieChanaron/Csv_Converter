@@ -33,19 +33,19 @@ const addMissingColumnToHtml = header => {
 
 // This function copies the values of the first table into the new table.
 const copyPasteValues = (inputHeader, outputHeader) => {
-    let indexCol = getColumnIndex(inputHeader);
-    if (inputHeader && indexCol === -1) {
+    let indexCol = getColumnIndex(inputHeader); // Position of the column
+    let count = columnsCount[inputHeader]; // Number of times a column should be added
+
+    if (inputHeader && !count) {
         console.log(`La colonne ${inputHeader} n'existe pas dans le fichier d'origine.`);
         addMissingColumnToHtml(inputHeader);
     }
-
-    let count = columnsCount[inputHeader]; // Number of times a column should be added
     
     for (let i = 0; (count && i < columnsCount[inputHeader]) || (!count && i < 1); i ++) {
         const length = convertedData[0].length; // To place the new column just after the previous one
         convertedData[0][length] = outputHeader;
 
-        for (let rowIndex = 1; indexCol !== -1 && rowIndex < initialData.length; rowIndex ++) {
+        for (let rowIndex = 1; count && rowIndex < initialData.length; rowIndex ++) {
             let value = initialData[rowIndex][indexCol];
             if (typeof value === 'string') value = formatAsCellContent(value);
             if (!convertedData[rowIndex]) convertedData[rowIndex] = [];
@@ -56,7 +56,7 @@ const copyPasteValues = (inputHeader, outputHeader) => {
 }
 
 
-// Do not parse \n, \r and semicolons inside of a single cell
+// Do not allow Excel to parse \n, \r and semicolons inside of a single cell
 const formatAsCellContent = string => {
     string = string.replace(/"/g, '""');
     return `"${string}"`;
