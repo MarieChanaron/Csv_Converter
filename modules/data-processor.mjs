@@ -41,7 +41,7 @@ const copyPasteValues = (inputHeader, outputHeader) => {
 
         for (let rowIndex = 1; indexCol !== -1 && rowIndex < initialData.length; rowIndex ++) {
             let value = initialData[rowIndex][indexCol];
-            if (typeof value === 'string') value = doNotParse(value);
+            if (typeof value === 'string') value = formatAsCellContent(value);
             convertedData[rowIndex][length] = value ? value : ''; // Add an empty string if there is no value (to avoid bugs later on when adding test steps)
         }
         indexCol ++;
@@ -50,7 +50,7 @@ const copyPasteValues = (inputHeader, outputHeader) => {
 
 
 // Do not parse \n, \r and semicolons inside of a single cell
-const doNotParse = string => {
+const formatAsCellContent = string => {
     string = string.replace(/"/g, '""');
     return `"${string}"`;
 }
@@ -101,9 +101,9 @@ const addManualTestSteps = testStepsIndex => {
         // Add test steps data (columns: Action, Data, Result) to the final array
         jsonObject.forEach((testStep, pos) => {
             const fields = testStep.fields;
-            const action = doNotParse(fields['Action']);
-            const data = doNotParse(fields['Data']);
-            const result = doNotParse(fields['Expected Result']);
+            const action = formatAsCellContent(fields['Action']);
+            const data = formatAsCellContent(fields['Data']);
+            const result = formatAsCellContent(fields['Expected Result']);
             if (pos === 0) { // Add the first test step directly in the issue row
                 convertedData[issueIndex][actionIndex] = action;
                 convertedData[issueIndex][dataIndex] = data;
