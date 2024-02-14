@@ -1,7 +1,8 @@
 /*
 Matching between the input file and the output file.
-On the left (key): input file
-On the right (value): output file
+On the left (key): output file
+On the right (value): input file
+Configure here the order of columns of the final file, and the correspondance between columns between the file of origin and final file
 */
 const headers = {
     "Issue Key": "Issue key",

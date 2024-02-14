@@ -1,15 +1,15 @@
 // This function generates the output CSV file
 const writeCsv = twoDArray => {
-
+    
     // Transform the 2D array into a string 
     const lines = [];
 
     twoDArray.forEach(element => {
-        const joinedColumns = element.join(';');
+        const joinedColumns = element.join(COLUMN_SEPARATOR);
         lines.push(joinedColumns);
     });
 
-    const csvContent = lines.join('\r\n');
+    const csvContent = lines.join(ROW_SEPARATOR);
 
     // Create a new CSV file
     const csvFile = new Blob([csvContent], {type: 'text/csv'});

@@ -105,7 +105,7 @@ const parseRowIntoColumns = row => {
             case '"':
                 withinQuotes = !withinQuotes;
                 break;
-            case ';':
+            case COLUMN_SEPARATOR:
                 if (!withinQuotes) { // If the semicolons are within quotes then it's part of the text and not a column separator
                     const col = currentColumn.join('');
                     columnsArray.push(col);
@@ -128,7 +128,7 @@ const parseRowIntoColumns = row => {
 
 const parseData = content => {
     // Create an array where each item is a row in our table
-    const rowsArray = content.split(/\r\n/);
+    const rowsArray = content.split(ROW_SEPARATOR);
     const twoDArray = [];
 
     // Parse our rows array more finely to make a two dimensions array where each item in the second level arrays are the columns
