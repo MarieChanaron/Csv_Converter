@@ -42,19 +42,12 @@ const insertNewRows = (rowsArray, position) => {
 }
 
 
-// Fill the columns TCID, Action, Data and Result
-// Return the number of rows inserted
-const copyPasteTestSteps = (indexOrigin, indexDestination) => {
-    // Add The TCID. The TCID is added outside of the foreach loop below because some issues may not have some test steps
-    if (initialData[indexOrigin][0].length && convertedData[indexDestination]) {
-        convertedData[indexDestination][tcidIndex] = `"${indexOrigin}"`;
-    }
-    
-    // Add test steps data (columns: Action, Data, Result) to the final array
-    const newRows = [];
-    let jsonObject = initialData[indexOrigin][testStepsIndex];
-    if (!jsonObject) return newRows.length; // To fix bugs in different browsers in case jsonObject is undefined (can happen if the column did not exist in the file of origin)
-    
+// This function writes the test steps in the new table
+// Ths first test step is added to the issue line
+// Further test steps are added to new lines that are inserted to the final table
+const insertTestSteps = (jsonObject, rowIndex, tcid) => {
+    let newRows = [];
+
     jsonObject.forEach((testStep, pos) => {
         const {fields} = testStep;
         const action = formatAsCellContent(fields[ACTION_JSON_PROPERTY]);
@@ -62,22 +55,40 @@ const copyPasteTestSteps = (indexOrigin, indexDestination) => {
         const result = formatAsCellContent(fields[RESULT_JSON_PROPERTY]);
 
         if (pos === 0) { // Add the first test step directly in the issue row
-            convertedData[indexDestination][actionIndex] = action;
-            convertedData[indexDestination][dataIndex] = data;
-            convertedData[indexDestination][resultIndex] = result;
+            convertedData[rowIndex][actionIndex] = action;
+            convertedData[rowIndex][dataIndex] = data;
+            convertedData[rowIndex][resultIndex] = result;
         } else { // For the additional test steps: make new rows
-            const newRow = new Array(convertedData[0].length);
-            newRow.fill('');
+            const newRow = new Array(convertedData[0].length).fill('');
+            newRow[tcidIndex] = `"${tcid}"`; // Add the TCID in the new row
             newRow[actionIndex] = action;
             newRow[dataIndex] = data;
             newRow[resultIndex] = result;
-            newRow[tcidIndex] = `"${indexOrigin}"`; // Add the TCID in the new row
             newRows.push(newRow);
         }
     });
     
-    insertNewRows(newRows, indexDestination + 1); // Add the new rows to the convertedData array
-    return newRows.length; // Returns the numbers of rows added
+    if (newRows.length) insertNewRows(newRows, rowIndex + 1); // Add the new rows to the convertedData array
+    return newRows.length;
+}
+
+
+// Fill the columns TCID, Action, Data and Result
+// Return the number of rows inserted
+// originIndex: index of the row of the issue in initialData
+// destinationIndex: index of the row of the issue in convertedData
+const copyPasteTestSteps = (originIndex, destinationIndex) => {
+    // Add The TCID. The TCID is added outside of the foreach loop below because some issues may not have some test steps
+    const tcid = originIndex;
+    if (initialData[originIndex][0].length && convertedData[destinationIndex]) {
+        convertedData[destinationIndex][tcidIndex] = `"${tcid}"`;
+    }
+    
+    // Add test steps data (columns: Action, Data, Result) to the final array
+    let jsonObject = initialData[originIndex][testStepsIndex]; // Get test steps
+    const newRowsNr = insertTestSteps(jsonObject, destinationIndex, tcid); // Insert test steps
+
+    return newRowsNr; // Returns the numbers of rows added
 }
 
 
