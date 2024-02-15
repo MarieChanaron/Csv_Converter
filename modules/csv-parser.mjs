@@ -19,13 +19,6 @@ const parseJsonString = jsonString => {
 }
 
 
-// Make the json string compatible with the json format to be able to read it as an object
-const formatJsonString = jsonString => {
-    const newJsonString = jsonString.replace(/""/g, '"'); // Replace "" by "
-    return newJsonString;
-}
-
-
 // Parse the rows array to extract the json string containing the test steps
 // Note: Because the 2 dimensions array contains the json string WITHOUT quotes, it's not possible to read the json string.
 // It was complicated to add quotes manually in this json string so the solution was to use the function split() that automatically adds quotes.
@@ -37,7 +30,7 @@ const parseJsonData = (row, issueKey) => {
         secondSection = firstSection.split('}]')[0];
         if (secondSection[secondSection.length - 1] === ':') secondSection += '""""';
     }
-    let jsonString = secondSection ? `[{${formatJsonString(secondSection)}}]` : '[]';
+    let jsonString = secondSection ? `[{${formatAsJsonString(secondSection)}}]` : '[]';
     
     const {jsonObject, error} = parseJsonString(jsonString);
     if (error[0]) {

@@ -32,13 +32,6 @@ const copyPasteValues = (inputHeader, outputHeader) => {
 }
 
 
-// Do not allow Excel to parse \n, \r and semicolons inside of a single cell
-const formatAsCellContent = string => {
-    string = string.replace(/"/g, '""');
-    return `"${string}"`;
-}
-
-
 // Insert new entries inside of an array
 // rowsArray: Array containing all of the rows to add in the table
 // Position: index of the row where we want to start to insert the new rows
