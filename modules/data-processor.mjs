@@ -87,12 +87,13 @@ const addManualTestSteps = () => {
 // This function copies the values of the first table into the new table.
 const copyPasteValues = (inputHeader, outputHeader, count) => {
     let indexCol = getColumnIndex(inputHeader, initialData); // Position of the column in the initialData array
+    let nbOfColumnsInserted = 0;
 
     if (inputHeader && !count) { // If the inputHeader matches with a required outputHeader, but the column containing this inputHeader doesn't exist in initialData
         logColumnMissingError(inputHeader);
     }
-    
-    for (let i = 0; (count && i < count) || (!count && i < 1); i ++) {
+
+    do {
         const length = convertedData[0].length; // To place the new column just after the previous one
         convertedData[0][length] = outputHeader; // Always add a column with at least a header in convertedData
 
@@ -102,10 +103,9 @@ const copyPasteValues = (inputHeader, outputHeader, count) => {
             if (!convertedData[rowIndex]) convertedData[rowIndex] = [];
             convertedData[rowIndex][length] = value ? value : ''; // Add an empty string if there is no value (to avoid bugs later on when adding test steps)
         }
-        indexCol ++;
-    }
+        indexCol ++; nbOfColumnsInserted ++;
+    } while (nbOfColumnsInserted < count);
 }
-
 
 
 // The default function
@@ -118,7 +118,7 @@ const convertData = parsedData => {
     for (const columnName in HEADERS) {
         const inputColumnName = HEADERS[columnName];
         const outputColumnName = columnName;
-        const count = columnsCount[inputColumnName]; // Number of times a particular column (header) should be added
+        const count = columnsCount[inputColumnName]; // Number of times a particular column should be added
         copyPasteValues(inputColumnName, outputColumnName, count);
     }
 
