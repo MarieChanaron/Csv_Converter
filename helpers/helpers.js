@@ -11,10 +11,3 @@ const countHeaders = array => {
 }
 
 
-const logColumnMissingError = columnName => {
-    console.log(`La colonne ${columnName} n'existe pas dans le fichier d'origine.`);
-    const p = document.createElement('p');
-    p.innerHTML = `La colonne <i>${columnName}</i> n'existe pas dans le fichier d'origine.`;
-    const errorsDivElement = document.getElementById('errors');
-    errorsDivElement.appendChild(p);
-}
