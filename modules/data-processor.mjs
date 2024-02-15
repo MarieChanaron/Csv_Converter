@@ -1,17 +1,17 @@
-let initialData;
-let convertedData;
-let columnsCount = {};
+let initialData; // 2 dimensional array containing the data received
+let convertedData; // 2 dimensional array containing the converted data
+// 2 dimensional array : 1st dimension = rows - 2nd dimension = columns
 
-let tcidIndex;
-let actionIndex;
-let dataIndex;
-let resultIndex;
-let testStepsIndex;
+let columnsCount = {}; // Value initialized by the function countHeaders()
+
+let tcidIndex, actionIndex, dataIndex, resultIndex; // The positions of the columns TCID, Action, Data and Result in the table of destination (starting from zero)
+let testStepsIndex; // The position of the column Custom field (Manual Test Steps) in the table of origin (starting from zero). This column matches the columns Action, Data and Result in the new table
 
 
 // This function returns an object where:
 // Each key is the name of each column in the first table (all the columns and not only the ones needed)
 // Values are integers representing the number of times this column is found in the first table
+// Used to initialize the value of the global variable columnsCount;
 const countHeaders = () => {
     let headersCount = initialData[0].reduce((accumulator, currentValue) => {
         return accumulator[currentValue] ? ++accumulator[currentValue] :
@@ -142,9 +142,9 @@ const getColumnIndex = (columnName, tableName = initialData) => {
 // The default function
 const convertData = parsedData => {
     // Initialize global variables used throughout our functions
-    convertedData = [[]]; // To reinitialize the value in case the form is resubmitted
-    initialData = parsedData; // Contains all the data parsed in the CSV
-    columnsCount = countHeaders();
+    convertedData = [[]]; // Reinitialize the value in case the form is resubmitted (avoid keeping old data in cache)
+    initialData = parsedData;
+    columnsCount = countHeaders(); 
 
     for (const header in headers) {
         copyPasteValues(headers[header], header);
