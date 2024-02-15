@@ -47,17 +47,18 @@ window.onload = () => {
 const handleSubmit = async(event) => {
     event.preventDefault();
     const [file] = document.getElementById('file-input').files;
+    
     if (!file) {
         alert('Merci de choisir un fichier.');
     } else {
-        console.clear();
+        // console.clear();
         showSpinner();
         hideLogs();
 
         const fileContent = await readFile(file);
         const parsedData = parseData(fileContent);
         const convertedData = convertData(parsedData);
-        writeCsv(convertedData);
+        writeCsv(file.name, convertedData);
 
         hideSpinner();
         showLogs(convertedData);

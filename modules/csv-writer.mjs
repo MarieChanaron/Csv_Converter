@@ -1,5 +1,5 @@
 // This function generates the output CSV file
-const writeCsv = twoDArray => {
+const writeCsv = (fileName, twoDArray) => {
     
     // Transform the 2D array into a string 
     const lines = [];
@@ -18,7 +18,7 @@ const writeCsv = twoDArray => {
     // Download the CSV file
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'fichierFinal.csv';
+    link.download = `${fileName.split('.')[0]} - Test Case Importer.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
