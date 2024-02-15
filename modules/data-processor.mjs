@@ -57,9 +57,9 @@ const copyPasteTestSteps = (indexOrigin, indexDestination) => {
     
     jsonObject.forEach((testStep, pos) => {
         const {fields} = testStep;
-        const action = formatAsCellContent(fields['Action']);
-        const data = formatAsCellContent(fields['Data']);
-        const result = formatAsCellContent(fields['Expected Result']);
+        const action = formatAsCellContent(fields[ACTION_JSON_PROPERTY]);
+        const data = formatAsCellContent(fields[DATA_JSON_PROPERTY]);
+        const result = formatAsCellContent(fields[RESULT_JSON_PROPERTY]);
 
         if (pos === 0) { // Add the first test step directly in the issue row
             convertedData[indexDestination][actionIndex] = action;
@@ -83,10 +83,10 @@ const copyPasteTestSteps = (indexOrigin, indexDestination) => {
 
 const addManualTestSteps = () => {
     // Retrieval of the column positions of Action, Data, Result and TCID columns (in the new table)
-    tcidIndex = getColumnIndex('TCID', convertedData);
-    actionIndex = getColumnIndex('Action', convertedData);
-    dataIndex = getColumnIndex('Data', convertedData);
-    resultIndex = getColumnIndex('Result', convertedData);
+    tcidIndex = getColumnIndex(TCID_HEADER, convertedData);
+    actionIndex = getColumnIndex(ACTION_HEADER, convertedData);
+    dataIndex = getColumnIndex(DATA_HEADER, convertedData);
+    resultIndex = getColumnIndex(RESULT_HEADER, convertedData);
     // Get index of the column in the table of origin
     testStepsIndex = getColumnIndex(TEST_STEPS_HEADER, initialData);
 
@@ -106,8 +106,8 @@ const convertData = parsedData => {
     initialData = parsedData;
     columnsCount = countHeaders(initialData[0]); 
 
-    for (const header in headers) {
-        copyPasteValues(headers[header], header);
+    for (const header in HEADERS) {
+        copyPasteValues(HEADERS[header], header);
     }
 
     addManualTestSteps();

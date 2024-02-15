@@ -1,10 +1,23 @@
+// This single column corresponds to 3 columns in the final table:
+// Action / Data / Result
+const TEST_STEPS_HEADER = 'Custom field (Manual Test Steps)'
+
+const TCID_HEADER = 'TCID';
+const ACTION_HEADER = 'Action';
+const DATA_HEADER = 'Data';
+const RESULT_HEADER = 'Result';
+
+const ACTION_JSON_PROPERTY = 'Action';
+const DATA_JSON_PROPERTY = 'Data';
+const RESULT_JSON_PROPERTY = 'Expected Result';
+
 /*
 Matching between the input file and the output file.
 On the left (key): output file
 On the right (value): input file
 Configure here the order of columns of the final file, and the correspondance between columns between the file of origin and final file
 */
-const headers = {
+const HEADERS = {
     "Issue Key": "Issue key",
     "Type": "Issue Type",
     "Test Type": "Custom field (Test Type)",
@@ -31,8 +44,3 @@ const headers = {
     "Environment": "Environment",
     "Created": "Created"
 }
-
-
-// This single column corresponds to 3 columns in the final table:
-// Action / Data / Result
-const TEST_STEPS_HEADER = 'Custom field (Manual Test Steps)'
