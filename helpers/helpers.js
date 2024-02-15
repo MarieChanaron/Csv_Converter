@@ -11,3 +11,9 @@ const countHeaders = array => {
 }
 
 
+// Return the index of the column in the table
+// Returns -1 if the column has not been found
+const getColumnIndex = (columnName, tableName) => {
+    const header = Array.isArray(tableName[0]) ? tableName[0] : tableName;
+    return header.indexOf(columnName);
+}

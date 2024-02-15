@@ -10,7 +10,7 @@ let testStepsIndex; // The position of the column Custom field (Manual Test Step
 
 // This function copies the values of the first table into the new table.
 const copyPasteValues = (inputHeader, outputHeader) => {
-    let indexCol = getColumnIndex(inputHeader); // Position of the column
+    let indexCol = getColumnIndex(inputHeader, initialData); // Position of the column
     let count = columnsCount[inputHeader]; // Number of times a column should be added
 
     if (inputHeader && !count) {
@@ -95,7 +95,7 @@ const addManualTestSteps = () => {
     dataIndex = getColumnIndex('Data', convertedData);
     resultIndex = getColumnIndex('Result', convertedData);
     // Get index of the column in the table of origin
-    testStepsIndex = getColumnIndex(TEST_STEPS_HEADER);
+    testStepsIndex = getColumnIndex(TEST_STEPS_HEADER, initialData);
 
     let issueIndex = 1;
     
@@ -103,14 +103,6 @@ const addManualTestSteps = () => {
         const nrOfNewRows = copyPasteTestSteps(i, issueIndex);
         issueIndex += nrOfNewRows ? nrOfNewRows + 1 : 1;
     }
-}
-
-
-// Return the index of the column in the table (by default the first table if there is only one argument)
-// Returns -1 if the column has not been found
-const getColumnIndex = (columnName, tableName = initialData) => {
-    const header = tableName[0];
-    return header.indexOf(columnName);
 }
 
 

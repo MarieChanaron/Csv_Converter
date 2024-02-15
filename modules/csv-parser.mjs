@@ -81,7 +81,7 @@ const parseData = content => {
     rowsArray.forEach((row, index) => {
         const columnsArray = parseRowIntoColumns(row);
         if (index === 0) {
-            testStepsIndex = columnsArray.indexOf(TEST_STEPS_HEADER);
+            testStepsIndex = getColumnIndex(TEST_STEPS_HEADER, columnsArray);
             if (testStepsIndex === -1) logColumnMissingError(TEST_STEPS_HEADER);
         } else if (testStepsIndex > 0) {
             const jsonObject = parseJsonData(row, columnsArray[0]);
