@@ -2,34 +2,8 @@ let initialData; // 2 dimensional array containing the data received
 let convertedData; // 2 dimensional array containing the converted data
 // 2 dimensional array : 1st dimension = rows - 2nd dimension = columns
 
-let columnsCount = {}; // Value initialized by the function countHeaders()
-
 let tcidIndex, actionIndex, dataIndex, resultIndex; // The positions of the columns TCID, Action, Data and Result in the table of destination (starting from zero)
 let testStepsIndex; // The position of the column Custom field (Manual Test Steps) in the table of origin (starting from zero). This column matches the columns Action, Data and Result in the new table
-
-
-// This function copies the values of the first table into the new table.
-const copyPasteValues = (inputHeader, outputHeader) => {
-    let indexCol = getColumnIndex(inputHeader, initialData); // Position of the column
-    let count = columnsCount[inputHeader]; // Number of times a column should be added
-
-    if (inputHeader && !count) {
-        logColumnMissingError(inputHeader);
-    }
-    
-    for (let i = 0; (count && i < columnsCount[inputHeader]) || (!count && i < 1); i ++) {
-        const length = convertedData[0].length; // To place the new column just after the previous one
-        convertedData[0][length] = outputHeader;
-
-        for (let rowIndex = 1; count && rowIndex < initialData.length; rowIndex ++) {
-            let value = initialData[rowIndex][indexCol];
-            if (typeof value === 'string') value = formatAsCellContent(value);
-            if (!convertedData[rowIndex]) convertedData[rowIndex] = [];
-            convertedData[rowIndex][length] = value ? value : ''; // Add an empty string if there is no value (to avoid bugs later on when adding test steps)
-        }
-        indexCol ++;
-    }
-}
 
 
 // Insert new entries inside of an array
@@ -86,7 +60,7 @@ const copyPasteTestSteps = (originIndex, destinationIndex) => {
     
     // Add test steps data (columns: Action, Data, Result) to the final array
     let jsonObject = initialData[originIndex][testStepsIndex]; // Get test steps
-    const newRowsNr = insertTestSteps(jsonObject, destinationIndex, tcid); // Insert test steps
+    const newRowsNr = jsonObject ? insertTestSteps(jsonObject, destinationIndex, tcid) : 0; // Insert test steps only if jsonObject exists, and if so assign the number of rows inserted, or zero if jsonObject does not exist.
 
     return newRowsNr; // Returns the numbers of rows added
 }
@@ -110,15 +84,42 @@ const addManualTestSteps = () => {
 }
 
 
+// This function copies the values of the first table into the new table.
+const copyPasteValues = (inputHeader, outputHeader, count) => {
+    let indexCol = getColumnIndex(inputHeader, initialData); // Position of the column in the initialData array
+
+    if (inputHeader && !count) { // If the inputHeader matches with a required outputHeader, but the column containing this inputHeader doesn't exist in initialData
+        logColumnMissingError(inputHeader);
+    }
+    
+    for (let i = 0; (count && i < count) || (!count && i < 1); i ++) {
+        const length = convertedData[0].length; // To place the new column just after the previous one
+        convertedData[0][length] = outputHeader; // Always add a column with at least a header in convertedData
+
+        for (let rowIndex = 1; count && rowIndex < initialData.length; rowIndex ++) {
+            let value = initialData[rowIndex][indexCol];
+            if (typeof value === 'string') value = formatAsCellContent(value);
+            if (!convertedData[rowIndex]) convertedData[rowIndex] = [];
+            convertedData[rowIndex][length] = value ? value : ''; // Add an empty string if there is no value (to avoid bugs later on when adding test steps)
+        }
+        indexCol ++;
+    }
+}
+
+
+
 // The default function
 const convertData = parsedData => {
     // Initialize global variables used throughout our functions
     convertedData = [[]]; // Reinitialize the value in case the form is resubmitted (avoid keeping old data in cache)
     initialData = parsedData;
-    columnsCount = countHeaders(initialData[0]); 
+    const columnsCount = countHeaders(initialData[0]);
 
-    for (const header in HEADERS) {
-        copyPasteValues(HEADERS[header], header);
+    for (const columnName in HEADERS) {
+        const inputColumnName = HEADERS[columnName];
+        const outputColumnName = columnName;
+        const count = columnsCount[inputColumnName]; // Number of times a particular column (header) should be added
+        copyPasteValues(inputColumnName, outputColumnName, count);
     }
 
     addManualTestSteps();
