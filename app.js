@@ -51,7 +51,7 @@ const handleSubmit = async(event) => {
     if (!file) {
         alert('Merci de choisir un fichier.');
     } else {
-        // console.clear();
+        console.clear();
         showSpinner();
         hideLogs();
 
