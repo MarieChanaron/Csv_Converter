@@ -94,15 +94,18 @@ const copyPasteValues = (inputHeader, outputHeader, count) => {
     }
 
     do {
+        // Insert the header
         const length = convertedData[0].length; // To place the new column just after the previous one
         convertedData[0][length] = outputHeader; // Always add a column with at least a header in convertedData
 
+        // Insert all the values of that column issue by issue
         for (let rowIndex = 1; count && rowIndex < initialData.length; rowIndex ++) {
             let value = initialData[rowIndex][indexCol];
             if (typeof value === 'string') value = formatAsCellContent(value);
             if (!convertedData[rowIndex]) convertedData[rowIndex] = [];
             convertedData[rowIndex][length] = value ? value : ''; // Add an empty string if there is no value (to avoid bugs later on when adding test steps)
         }
+
         indexCol ++; nbOfColumnsInserted ++;
     } while (nbOfColumnsInserted < count);
 }
