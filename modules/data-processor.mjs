@@ -100,10 +100,9 @@ const copyPasteValues = (inputHeader, outputHeader, count) => {
 
         // Insert all the values of that column issue by issue
         for (let rowIndex = 1; count && rowIndex < initialData.length; rowIndex ++) {
-            let value = initialData[rowIndex][indexCol];
-            if (typeof value === 'string') value = formatAsCellContent(value);
             if (!convertedData[rowIndex]) convertedData[rowIndex] = [];
-            convertedData[rowIndex][length] = value ? value : ''; // Add an empty string if there is no value (to avoid bugs later on when adding test steps)
+            let value = initialData[rowIndex][indexCol];
+            if (typeof value === 'string') convertedData[rowIndex][length] = formatAsCellContent(value);
         }
 
         indexCol ++; nbOfColumnsInserted ++;
