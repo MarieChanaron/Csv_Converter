@@ -11,9 +11,9 @@ const countHeaders = array => {
 }
 
 
-// Return the index of the column in the table
+// This function returns the index of the column in the table
 // Returns -1 if the column has not been found
-const getColumnIndex = (columnName, tableName) => {
-    const header = Array.isArray(tableName[0]) ? tableName[0] : tableName;
+const getColumnIndex = (columnName, array) => {
+    const header = Array.isArray(array[0]) ? array[0] : array; // Check if the array is an array with 2 dimensions and if so search the position only in the headers (index 0)
     return header.indexOf(columnName);
 }
