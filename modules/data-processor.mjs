@@ -107,7 +107,7 @@ const copyPasteValues = (inputHeader, outputHeader, count) => {
         }
 
         indexCol ++; nbOfColumnsInserted ++;
-    } while (nbOfColumnsInserted < count);
+    } while (nbOfColumnsInserted < count); // As long as the number of columns inserted for a particular column name is less than the number of existing columns in the entry table for the same column name
 }
 
 
