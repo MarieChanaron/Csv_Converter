@@ -1,6 +1,3 @@
-let testStepsIndex; // Store the position of the test steps json data, starting from zero
-
-
 // Show the logs of the json parsing errors to the interface
 const addParsingErrorToHtml = (issueKey, error, jsonString) => {
     
@@ -65,7 +62,6 @@ const formatJsonString = jsonString => {
 }
 
 
-
 // Parse the rows array to extract the json string containing the test steps
 // Note: Because the 2 dimensions array contains the json string WITHOUT quotes, it's not possible to read the json string.
 // It was complicated to add quotes manually in this json string so the solution was to use the function split() that automatically adds quotes.
@@ -92,13 +88,6 @@ const parseJsonData = (row, issueKey) => {
 }
 
 
-const findTestStepsIndex = (columns, cellContent) => {
-    if (cellContent === TEST_STEPS_HEADER) {
-        testStepsIndex = columns.indexOf(cellContent);
-    }
-}
-
-
 // Parse our columns by COLUMN_SEPARATOR
 const parseRowIntoColumns = row => {
     const columnsArray = [];
@@ -115,7 +104,6 @@ const parseRowIntoColumns = row => {
         } else {
             const cell = currentColumn.join('');
             columnsArray.push(cell);
-            if (!testStepsIndex) findTestStepsIndex(columnsArray, cell);
             currentColumn = [];
         }
     }
@@ -128,11 +116,15 @@ const parseData = content => {
     // Create an array where each item is a row in our table
     const rowsArray = content.split(ROW_SEPARATOR);
     const twoDArray = [];
+    let testStepsIndex;
 
     // Parse our rows array more finely to make a two dimensions array where each item in the second level arrays are the columns
     rowsArray.forEach((row, index) => {
         const columnsArray = parseRowIntoColumns(row);
-        if (index !== 0 && testStepsIndex) {
+        if (index === 0) {
+            testStepsIndex = columnsArray.indexOf(TEST_STEPS_HEADER);
+            if (testStepsIndex === -1) logColumnMissingError(TEST_STEPS_HEADER);
+        } else if (testStepsIndex > 0) {
             const jsonObject = parseJsonData(row, columnsArray[0]);
             columnsArray[testStepsIndex] = jsonObject;
         }

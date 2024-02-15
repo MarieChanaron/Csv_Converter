@@ -8,37 +8,13 @@ let tcidIndex, actionIndex, dataIndex, resultIndex; // The positions of the colu
 let testStepsIndex; // The position of the column Custom field (Manual Test Steps) in the table of origin (starting from zero). This column matches the columns Action, Data and Result in the new table
 
 
-// This function returns an object where:
-// Each key is the name of each column in the first table (all the columns and not only the ones needed)
-// Values are integers representing the number of times this column is found in the first table
-// Used to initialize the value of the global variable columnsCount;
-const countHeaders = () => {
-    let headersCount = initialData[0].reduce((accumulator, currentValue) => {
-        return accumulator[currentValue] ? ++accumulator[currentValue] :
-                                            accumulator[currentValue] = 1,
-                                            accumulator
-    }, {});
-    return headersCount;
-}
-
-
-// Indicate to the user that a column is missing in the first table
-const addMissingColumnToHtml = header => {
-    const p = document.createElement('p');
-    p.innerHTML = `La colonne <i>${header}</i> n'existe pas dans le fichier d'origine.`;
-    const errorsDivElement = document.getElementById('errors');
-    errorsDivElement.appendChild(p);
-}
-
-
 // This function copies the values of the first table into the new table.
 const copyPasteValues = (inputHeader, outputHeader) => {
     let indexCol = getColumnIndex(inputHeader); // Position of the column
     let count = columnsCount[inputHeader]; // Number of times a column should be added
 
     if (inputHeader && !count) {
-        console.log(`La colonne ${inputHeader} n'existe pas dans le fichier d'origine.`);
-        addMissingColumnToHtml(inputHeader);
+        logColumnMissingError(inputHeader);
     }
     
     for (let i = 0; (count && i < columnsCount[inputHeader]) || (!count && i < 1); i ++) {
@@ -74,6 +50,7 @@ const insertNewRows = (rowsArray, position) => {
 
 
 // Fill the columns TCID, Action, Data and Result
+// Return the number of rows inserted
 const copyPasteTestSteps = (indexOrigin, indexDestination) => {
     // Add The TCID. The TCID is added outside of the foreach loop below because some issues may not have some test steps
     if (initialData[indexOrigin][0].length && convertedData[indexDestination]) {
@@ -83,7 +60,7 @@ const copyPasteTestSteps = (indexOrigin, indexDestination) => {
     // Add test steps data (columns: Action, Data, Result) to the final array
     const newRows = [];
     let jsonObject = initialData[indexOrigin][testStepsIndex];
-    if (!jsonObject) jsonObject = [];
+    if (!jsonObject) return newRows.length; // To fix bugs in different browsers in case jsonObject is undefined (can happen if the column did not exist in the file of origin)
     
     jsonObject.forEach((testStep, pos) => {
         const {fields} = testStep;
@@ -105,10 +82,8 @@ const copyPasteTestSteps = (indexOrigin, indexDestination) => {
             newRows.push(newRow);
         }
     });
-
-    // Add the new rows to the convertedData array
-    insertNewRows(newRows, indexDestination + 1);
-
+    
+    insertNewRows(newRows, indexDestination + 1); // Add the new rows to the convertedData array
     return newRows.length; // Returns the numbers of rows added
 }
 
@@ -144,7 +119,7 @@ const convertData = parsedData => {
     // Initialize global variables used throughout our functions
     convertedData = [[]]; // Reinitialize the value in case the form is resubmitted (avoid keeping old data in cache)
     initialData = parsedData;
-    columnsCount = countHeaders(); 
+    columnsCount = countHeaders(initialData[0]); 
 
     for (const header in headers) {
         copyPasteValues(headers[header], header);
