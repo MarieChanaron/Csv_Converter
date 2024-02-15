@@ -34,7 +34,7 @@ const showLogs = (data) => {
     if (data.length > 0) {
         confirmation.innerHTML = 'Le fichier a bien été généré. <img src="/images/checked.png" alt="icon" class="icon">';
     } else {
-        confirmation.innerHTML = "Le fichier n'a pas pu être généré.";
+        confirmation.innerHTML = "Une erreur s'est produite.";
     }
 }
 
