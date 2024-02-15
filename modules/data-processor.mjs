@@ -124,7 +124,11 @@ const convertData = parsedData => {
         copyPasteValues(inputColumnName, outputColumnName, count);
     }
 
-    addManualTestSteps();
+    addManualTestSteps(); 
+    // Note: addManualTestSteps() adds the test steps separately (not in copyPasteValues()) because it redimensions the table (adds new rows).
+    // A row can take several rows. So, for the columns on the right of the columns Action | Data | Result, it's hard to know on which row starts the next issue.
+    // It needs a function to find the row where is the issue key. But executing this function for each value is too consuming and inefficient.
+    // Hence it's easier to first copy paste all the values and then insert the manual test steps.
 
     return convertedData;
 }
