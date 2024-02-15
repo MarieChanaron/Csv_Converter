@@ -1,5 +1,5 @@
-let initialData = [[]];
-let convertedData = [[]];
+let initialData;
+let convertedData;
 let columnsCount = {};
 
 let tcidIndex;
@@ -61,7 +61,6 @@ const formatAsCellContent = string => {
     string = string.replace(/"/g, '""');
     return `"${string}"`;
 }
-
 
 
 // Insert new entries inside of an array
@@ -143,6 +142,7 @@ const getColumnIndex = (columnName, tableName = initialData) => {
 // The default function
 const convertData = parsedData => {
     // Initialize global variables used throughout our functions
+    convertedData = [[]]; // To reinitialize the value in case the form is resubmitted
     initialData = parsedData; // Contains all the data parsed in the CSV
     columnsCount = countHeaders();
 
